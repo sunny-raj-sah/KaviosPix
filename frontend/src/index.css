@@ -1,0 +1,216 @@
+ :root {
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #212529;
+  background-color: #f8f9fa;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  text-decoration: none;
+}
+/* ================================
+   KaviosPix Navbar
+================================ */
+
+.kaviospix-logo {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background: #0d6efd;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.kavios-nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  color: #6c757d;
+  font-size: 0.925rem;
+  font-weight: 500;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.kavios-nav-link:hover {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+.kavios-nav-active {
+  background-color: #eef5ff;
+  color: #0d6efd !important;
+  font-weight: 600;
+}
+
+.kavios-divider {
+  width: 1px;
+  height: 30px;
+  background-color: #dee2e6;
+  margin: 0 0.5rem;
+}
+
+/* Account button */
+
+.kavios-account-btn {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.kavios-account-btn:hover,
+.kavios-account-btn:focus {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+}
+
+.kavios-avatar {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #0d6efd;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.kavios-avatar-large {
+  width: 46px;
+  height: 46px;
+  flex-basis: 46px;
+}
+
+.kavios-account-info {
+  min-width: 0;
+  max-width: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.25;
+}
+
+.kavios-account-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #212529;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.kavios-account-email {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #6c757d;
+  font-size: 0.74rem;
+}
+
+.kavios-arrow {
+  color: #6c757d;
+  font-size: 0.8rem;
+  margin-left: 0.15rem;
+}
+
+/* Account dropdown */
+
+.kavios-account-menu {
+  width: 320px;
+  margin-top: 0.5rem !important;
+  padding: 0.5rem;
+  border: 1px solid #e9ecef;
+  border-radius: 14px;
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.kavios-account-header {
+  padding: 0.75rem;
+}
+
+.kavios-email-box {
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  background-color: #f8f9fa;
+}
+
+.kavios-logout {
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+}
+
+.kavios-logout:hover {
+  background-color: #fff1f2;
+  color: #dc3545;
+}
+
+/* Mobile */
+
+@media (max-width: 991.98px) {
+  .kavios-account-info {
+    max-width: 100%;
+  }
+
+  .kavios-account-email {
+    max-width: 250px;
+  }
+
+  .kavios-account-menu {
+    width: 100%;
+    min-width: 280px;
+  }
+
+  .kavios-divider {
+    display: none;
+  }
+}
