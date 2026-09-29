@@ -122,6 +122,7 @@ function ImageCard({
             addingComment={
               addingComment === imageId
             }
+              isAlbumOwner={isAlbumOwner}
           />
         </div>
       </div>

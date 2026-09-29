@@ -83,9 +83,12 @@ const googleCallback = (req, res) => {
     const token = generateToken(req.user);
 
     console.log("JWT generated:", Boolean(token));
+    
+  const frontendUrl =process.env.FRONTEND_URL || "http://localhost:5173";
+
 
     return res.redirect(
-      `http://localhost:5173/auth/callback#token=${encodeURIComponent(
+      `${frontendUrl}/auth/callback#token=${encodeURIComponent(
         token
       )}`
     );
