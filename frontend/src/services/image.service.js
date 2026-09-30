@@ -75,6 +75,17 @@ export const addComment = async (
   return response.data;
 };
 
+export const deleteComment = async (
+  albumId,
+  imageId,
+  commentId
+) => {
+  const response = await api.delete(
+    `/albums/${albumId}/images/${imageId}/comments/${commentId}`
+  );
+
+  return response.data;
+};
 export const deleteImage = async (
   albumId,
   imageId

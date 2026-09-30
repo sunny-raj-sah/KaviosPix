@@ -313,11 +313,52 @@ const deleteImage = async (req, res) => {
     });
   }
 };
+
+ const deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+
+    const commentIndex = Number(commentId);
+
+    if (
+      !Number.isInteger(commentIndex) ||
+      commentIndex < 0 ||
+      commentIndex >= req.image.comments.length
+    ) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    req.image.comments.splice(commentIndex, 1);
+
+    await req.image.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+      data: {
+        imageId: req.image.imageId,
+        albumId: req.image.albumId,
+        comments: req.image.comments,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete comment",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
     uploadImage,
     getAlbumImages,
      updateFavorite,
      addComment ,
+     deleteComment,
      getFavoriteImages ,
        deleteImage,
         serveImage,

@@ -22,6 +22,7 @@ const {
     updateAlbum,
   deleteAlbum,
   shareAlbum,
+    revokeAlbumAccess,
 
 } = require("../controllers/album.controller");
 
@@ -34,6 +35,7 @@ const {
   getFavoriteImages,
    updateFavorite,
      addComment,
+       deleteComment,
        deleteImage,
          serveImage,
 } = require("../controllers/image.controller");
@@ -69,6 +71,13 @@ router.post(
   requireAlbumOwner,
   shareAlbum
 );
+
+router.delete(
+  "/:albumId/share",
+  authenticate,
+  requireAlbumOwner,
+  revokeAlbumAccess
+);
 router.post(
   "/:albumId/images",
   authenticate,
@@ -99,6 +108,13 @@ router.post(
   requireAlbumOwner,
   requireImageInAlbum,
   addComment
+);
+router.delete(
+  "/:albumId/images/:imageId/comments/:commentId",
+  authenticate,
+  requireAlbumOwner,
+  requireImageInAlbum,
+  deleteComment
 );
 
 router.get(

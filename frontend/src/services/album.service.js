@@ -46,3 +46,15 @@ export const shareAlbum = async (
 
   return response.data;
 };
+export const revokeAlbumAccess = async (albumId, email) => {
+  const response = await api.delete(
+    `/albums/${albumId}/share`,
+    {
+      data: {
+        email,
+      },
+    }
+  );
+
+  return response.data;
+};

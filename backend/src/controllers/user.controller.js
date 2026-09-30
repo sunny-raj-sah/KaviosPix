@@ -37,7 +37,47 @@ const getCurrentUser = async (req, res) => {
 };
 
  
+const searchUsersByEmail = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email || !email.trim()) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+      });
+    }
+
+    const searchTerm = email.trim().toLowerCase();
+
+    const users = await User.find({
+      email: {
+        $regex: searchTerm,
+        $options: "i",
+      },
+    })
+      .select("userId email")
+      .limit(5)
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      data: users,
+    });
+  } catch (error) {
+    console.error("Search users error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to search users",
+      error: error.message,
+    });
+  }
+};
+
+ 
 module.exports = {
 createUser,
 getCurrentUser ,
+ searchUsersByEmail,
 };

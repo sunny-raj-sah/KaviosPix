@@ -10,7 +10,13 @@ import {
   uploadImage,
   updateFavorite,
   addComment,
+   deleteComment,
+    deleteImage,
 } from "../services/image.service";
+
+import {
+  revokeAlbumAccess,
+} from "../services/album.service";
 
 import AlbumHeader from "../components/albums/AlbumHeader";
 import AlbumUploadForm from "../components/albums/AlbumUploadForm";
@@ -53,7 +59,138 @@ function AlbumDetails() {
 
   //sharing
   const [sharing, setSharing] = useState(false);
+// delete state for the image
+const [deletingImage, setDeletingImage] = useState(null);
 
+// adding the name and tag to upload the image
+const [person, setPerson] = useState("");
+const [tags, setTags] = useState("");
+//comment delete
+const [deletingComment, setDeletingComment] =
+  useState(null);
+
+
+  // to revok the share  album to the mail id
+  const [revokingUser, setRevokingUser] =
+  useState(null);
+  // handler to revok the share  album to the mail id
+  const handleRevokeAccess = async (email) => {
+  const confirmed = window.confirm(
+    `Are you sure you want to revoke album access for ${email}?`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  try {
+    setRevokingUser(email);
+    setError("");
+
+    await revokeAlbumAccess(albumId, email);
+
+    setAlbum((currentAlbum) => ({
+      ...currentAlbum,
+      sharedUsers: currentAlbum.sharedUsers.filter(
+        (sharedEmail) =>
+          sharedEmail.toLowerCase() !==
+          email.toLowerCase()
+      ),
+    }));
+  } catch (err) {
+    console.error(
+      "Failed to revoke album access:",
+      err
+    );
+
+    setError(
+      err.response?.data?.message ||
+        "Failed to revoke album access."
+    );
+  } finally {
+    setRevokingUser(null);
+  }
+};
+  // delete comment handler
+  const handleDeleteComment = async (
+  imageId,
+  commentIndex
+) => {
+  try {
+    setDeletingComment({
+      imageId,
+      commentIndex,
+    });
+
+    setError("");
+
+    await deleteComment(
+      albumId,
+      imageId,
+      commentIndex
+    );
+
+    setImages((currentImages) =>
+      currentImages.map((image) => {
+        const currentImageId =
+          image.imageId || image._id;
+
+        if (currentImageId !== imageId) {
+          return image;
+        }
+
+        const updatedComments = [
+          ...(image.comments || []),
+        ];
+
+        updatedComments.splice(commentIndex, 1);
+
+        return {
+          ...image,
+          comments: updatedComments,
+        };
+      })
+    );
+  } catch (err) {
+    console.error(
+      "Failed to delete comment:",
+      err
+    );
+
+    setError(
+      err.response?.data?.message ||
+        err.message ||
+        "Failed to delete comment."
+    );
+
+    throw err;
+  } finally {
+    setDeletingComment(null);
+  }
+};
+// delete the image handeler
+const handleDeleteImage = async (imageId) => {
+  try {
+    setDeletingImage(imageId);
+    setError("");
+
+    await deleteImage(albumId, imageId);
+
+    setImages((currentImages) =>
+      currentImages.filter(
+        (image) =>
+          (image.imageId || image._id) !== imageId
+      )
+    );
+  } catch (err) {
+    setError(
+      err.response?.data?.message ||
+        "Failed to delete image."
+    );
+  } finally {
+    setDeletingImage(null);
+  }
+};
   // for share feature   control
   const isAlbumOwner = Boolean(
     album?.ownerId && user?.userId && album.ownerId === user.userId,
@@ -401,42 +538,100 @@ function AlbumDetails() {
   // UPLOAD IMAGE
   // --------------------------------------------------
 
-  const handleUploadImage = async (event) => {
-    event.preventDefault();
+  // const handleUploadImage = async (event) => {
+  //   event.preventDefault();
 
-    if (!selectedFile) {
-      setUploadError("Please select an image.");
+  //   if (!selectedFile) {
+  //     setUploadError("Please select an image.");
 
-      return;
+  //     return;
+  //   }
+
+  //   try {
+  //     setUploading(true);
+  //     setUploadError("");
+
+  //     const formData = new FormData();
+
+  //     formData.append("image", selectedFile);
+
+  //     const response = await uploadImage(albumId, formData);
+
+  //     console.log("POST /albums/:albumId/images response:", response);
+
+  //     setSelectedFile(null);
+  //     setShowUploadForm(false);
+
+  //     await loadImages();
+  //   } catch (err) {
+  //     console.error("Failed to upload image:", err);
+
+  //     setUploadError(
+  //       err.response?.data?.message || err.message || "Failed to upload image.",
+  //     );
+  //   } finally {
+  //     setUploading(false);
+  //   }
+  // };
+const handleUploadImage = async (event) => {
+  event.preventDefault();
+
+  if (!selectedFile) {
+    setUploadError("Please select an image.");
+
+    return;
+  }
+
+  try {
+    setUploading(true);
+    setUploadError("");
+
+    const formData = new FormData();
+
+    formData.append("image", selectedFile);
+
+    // Optional person name
+    if (person.trim()) {
+      formData.append("person", person.trim());
     }
 
-    try {
-      setUploading(true);
-      setUploadError("");
+    // Optional tags
+    if (tags.trim()) {
+      const tagList = tags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean);
 
-      const formData = new FormData();
-
-      formData.append("image", selectedFile);
-
-      const response = await uploadImage(albumId, formData);
-
-      console.log("POST /albums/:albumId/images response:", response);
-
-      setSelectedFile(null);
-      setShowUploadForm(false);
-
-      await loadImages();
-    } catch (err) {
-      console.error("Failed to upload image:", err);
-
-      setUploadError(
-        err.response?.data?.message || err.message || "Failed to upload image.",
-      );
-    } finally {
-      setUploading(false);
+      tagList.forEach((tag) => {
+        formData.append("tags", tag);
+      });
     }
-  };
 
+    const response = await uploadImage(albumId, formData);
+
+    console.log(
+      "POST /albums/:albumId/images response:",
+      response
+    );
+
+    setSelectedFile(null);
+    setPerson("");
+    setTags("");
+    setShowUploadForm(false);
+
+    await loadImages();
+  } catch (err) {
+    console.error("Failed to upload image:", err);
+
+    setUploadError(
+      err.response?.data?.message ||
+        err.message ||
+        "Failed to upload image."
+    );
+  } finally {
+    setUploading(false);
+  }
+};
   // --------------------------------------------------
   // CLOSE UPLOAD FORM
   // --------------------------------------------------
@@ -534,16 +729,30 @@ function AlbumDetails() {
         sharedUsers={Array.isArray(album.sharedUsers) ? album.sharedUsers : []}
         onShare={handleShareAlbum}
         sharing={sharing}
+         onRevoke={handleRevokeAccess}
+  revokingUser={revokingUser}
       />)}
       {showUploadForm && (
-        <AlbumUploadForm
-          selectedFile={selectedFile}
-          uploading={uploading}
-          uploadError={uploadError}
-          onFileChange={handleFileChange}
-          onSubmit={handleUploadImage}
-          onCancel={handleCancelUpload}
-        />
+        // <AlbumUploadForm
+        //   selectedFile={selectedFile}
+        //   uploading={uploading}
+        //   uploadError={uploadError}
+        //   onFileChange={handleFileChange}
+        //   onSubmit={handleUploadImage}
+        //   onCancel={handleCancelUpload}
+        // />
+  <AlbumUploadForm
+  selectedFile={selectedFile}
+  person={person}
+  tags={tags}
+  uploading={uploading}
+  uploadError={uploadError}
+  onFileChange={handleFileChange}
+  onPersonChange={(event) => setPerson(event.target.value)}
+  onTagsChange={(event) => setTags(event.target.value)}
+  onSubmit={handleUploadImage}
+  onCancel={handleCancelUpload}
+/>
       )}
       <ImageFilter
         activeTags={activeTags}
@@ -563,9 +772,11 @@ function AlbumDetails() {
         updatingFavorite={updatingFavorite}
         onAddComment={handleAddComment}
         addingComment={addingComment}
-         isAlbumOwner={
-    isAlbumOwner
-  }
+         isAlbumOwner={isAlbumOwner}
+   onDeleteImage={handleDeleteImage}
+  deletingImage={deletingImage}
+   onDeleteComment={handleDeleteComment}
+  deletingComment={deletingComment}
       />
     </div>
   );

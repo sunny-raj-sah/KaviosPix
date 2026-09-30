@@ -65,7 +65,14 @@ const getAlbums = async (req, res) => {
 
 const updateAlbum = async (req, res) => {
   try {
-    const { description } = req.body;
+    const { name,description } = req.body;
+
+      if (typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Album name is required",
+      });
+    }
 
     if (description !== undefined && typeof description !== "string") {
       return res.status(400).json({
@@ -73,6 +80,7 @@ const updateAlbum = async (req, res) => {
         message: "Description must be a string",
       });
     }
+      req.album.name = name.trim();
 
     req.album.description = description?.trim() || "";
 
@@ -235,10 +243,61 @@ const shareAlbum = async (req, res) => {
   }
 };
 
+const revokeAlbumAccess = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (typeof email !== "string" || !email.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required",
+      });
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    const sharedUsers = req.album.sharedUsers || [];
+
+    const sharedUserIndex = sharedUsers.findIndex(
+      (sharedEmail) =>
+        String(sharedEmail).toLowerCase() === normalizedEmail
+    );
+
+    if (sharedUserIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: "User does not have access to this album",
+      });
+    }
+
+    req.album.sharedUsers.splice(sharedUserIndex, 1);
+
+    await req.album.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Album access revoked successfully",
+      data: {
+        albumId: req.album.albumId,
+        sharedUsers: req.album.sharedUsers,
+      },
+    });
+  } catch (error) {
+    console.error("Revoke album access error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to revoke album access",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   createAlbum,
   getAlbums,
   updateAlbum,
   deleteAlbum,
   shareAlbum ,
+  revokeAlbumAccess,
 };
