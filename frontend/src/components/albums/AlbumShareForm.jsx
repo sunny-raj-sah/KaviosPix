@@ -776,33 +776,66 @@ function AlbumShareForm({
 
   const [showAllSharedUsers, setShowAllSharedUsers] = useState(false);
 
-  useEffect(() => {
-    const searchTerm = emailInput.trim();
+  // useEffect(() => {
+  //   const searchTerm = emailInput.trim();
 
-    if (!searchTerm) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+  //   if (!searchTerm) {
+  //     // eslint-disable-next-line react-hooks/set-state-in-effect
+  //     setSuggestions([]);
+  //     setSearchingUsers(false);
+  //     return;
+  //   }
+
+  //   const timer = setTimeout(async () => {
+  //     try {
+  //       setSearchingUsers(true);
+
+  //       const response = await searchUsersByEmail(searchTerm);
+
+  //       setSuggestions(response.data || []);
+  //     } catch (error) {
+  //       console.error("Failed to search users:", error);
+  //       setSuggestions([]);
+  //     } finally {
+  //       setSearchingUsers(false);
+  //     }
+  //   }, 300);
+
+  //   return () => clearTimeout(timer);
+  // }, [emailInput]);
+useEffect(() => {
+  // Get only the text after the last comma.
+  // Example:
+  // "new@3.com, su" -> "su"
+  const searchTerm = emailInput
+    .split(",")
+    .pop()
+    ?.trim();
+
+  if (!searchTerm) {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSuggestions([]);
+    setSearchingUsers(false);
+    return;
+  }
+
+  const timer = setTimeout(async () => {
+    try {
+      setSearchingUsers(true);
+
+      const response = await searchUsersByEmail(searchTerm);
+
+      setSuggestions(response.data || []);
+    } catch (error) {
+      console.error("Failed to search users:", error);
       setSuggestions([]);
+    } finally {
       setSearchingUsers(false);
-      return;
     }
+  }, 300);
 
-    const timer = setTimeout(async () => {
-      try {
-        setSearchingUsers(true);
-
-        const response = await searchUsersByEmail(searchTerm);
-
-        setSuggestions(response.data || []);
-      } catch (error) {
-        console.error("Failed to search users:", error);
-        setSuggestions([]);
-      } finally {
-        setSearchingUsers(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [emailInput]);
+  return () => clearTimeout(timer);
+}, [emailInput]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -856,26 +889,49 @@ function AlbumShareForm({
     }
   };
 
+  // const handleSuggestionClick = (email) => {
+  //   const normalizedEmail = email.trim().toLowerCase();
+
+  //   const currentEmails = emailInput
+  //     .split(",")
+  //     .map((item) => item.trim())
+  //     .filter(Boolean);
+
+  //   if (!currentEmails.includes(normalizedEmail)) {
+  //     const updatedEmails = [
+  //       ...currentEmails,
+  //       normalizedEmail,
+  //     ];
+
+  //     setEmailInput(`${updatedEmails.join(", ")}, `);
+  //   }
+
+  //   setSuggestions([]);
+  // };
+
   const handleSuggestionClick = (email) => {
-    const normalizedEmail = email.trim().toLowerCase();
+  const normalizedEmail = email.trim().toLowerCase();
 
-    const currentEmails = emailInput
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
+  const parts = emailInput.split(",");
 
-    if (!currentEmails.includes(normalizedEmail)) {
-      const updatedEmails = [
-        ...currentEmails,
-        normalizedEmail,
-      ];
+  // Remove the currently typed/searching keyword
+  parts.pop();
 
-      setEmailInput(`${updatedEmails.join(", ")}, `);
-    }
+  const selectedEmails = parts
+    .map((item) => item.trim())
+    .filter(Boolean);
 
-    setSuggestions([]);
-  };
+  // Avoid adding the same email twice
+  if (!selectedEmails.includes(normalizedEmail)) {
+    selectedEmails.push(normalizedEmail);
+  }
 
+  // Keep comma + space so the user can immediately search
+  // for the next user.
+  setEmailInput(`${selectedEmails.join(", ")}, `);
+
+  setSuggestions([]);
+};
   const visibleSharedUsers = showAllSharedUsers
     ? sharedUsers
     : sharedUsers.slice(0, 3);
