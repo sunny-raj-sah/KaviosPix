@@ -552,11 +552,11 @@ function ImageCard({
           </div>
 
           {/* Favorite indicator */}
-          {isFavorite && (
+          {/* {isFavorite && (
             <span className="badge text-bg-warning mb-2">
               ★ Favorite
             </span>
-          )}
+          )} */}
 
           {/* Comments toggle */}
           <button
