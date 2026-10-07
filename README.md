@@ -1,277 +1,371 @@
-# KaviosPix
+ # KaviosPix
 
-> A secure full-stack photo management application for organizing, protecting, and sharing personal photos through authenticated APIs.
+> **A secure full-stack photo management platform for organizing, protecting, and sharing personal images.**
 
-KaviosPix is a Google Photos-inspired image management application built with **React, Node.js, Express, MongoDB, and Google OAuth**.
+KaviosPix is a full-stack photo management application inspired by modern cloud photo platforms. It allows authenticated users to create albums, upload and organize images, share albums with other users, add tags and comments, and manage favorite photos.
 
-The application allows users to create albums, upload images, organize photos using tags, mark photos as favorites, add comments, and share albums with other users.
-
-The project focuses on building a secure API architecture where authentication and album-level authorization are checked before users can access protected resources.
+The application focuses heavily on **authentication, resource-level authorization, protected image access, file validation, and clean separation between frontend and backend responsibilities.**
 
 ---
 
-## 📌 Project Overview
+## Live Demo
 
-KaviosPix provides a centralized space for managing personal photo collections.
+**Frontend:**
+https://frontend-five-puce-11.vercel.app/
+
+**GitHub Repository:**
+https://github.com/sunny-raj-sah/KaviosPix
+
+---
+
+## Project Overview
+
+KaviosPix provides a centralized platform where users can securely manage their personal photo collections.
+
+The application supports:
+
+* Google OAuth authentication
+* JWT-based API authentication
+* Protected frontend routes
+* Album creation and management
+* Image uploads
+* Image validation
+* Album sharing
+* Resource-level authorization
+* Image tags and filtering
+* Favorites
+* Image comments
+* Protected image serving
+* Responsive React UI
+
+The core security model separates:
+
+```text
+Authentication
+      ↓
+Who is the user?
+      ↓
+Authorization
+      ↓
+What is the user allowed to access?
+```
+
+---
+
+# Key Features
+
+## Authentication
+
+KaviosPix uses Google OAuth for user authentication and JWT for protecting API requests.
+
+### Authentication flow
+
+```text
+User
+  │
+  │ Continue with Google
+  ▼
+Google OAuth
+  │
+  ▼
+Backend Callback
+  │
+  ▼
+Find/Create User
+  │
+  ▼
+Generate JWT
+  │
+  ▼
+Frontend Callback
+  │
+  ▼
+Store Authentication State
+  │
+  ▼
+Protected Application
+```
+
+Authenticated requests use:
+
+```http
+Authorization: Bearer <JWT>
+```
+
+The backend verifies the token before allowing access to protected resources.
+
+---
+
+# Album Management
 
 Users can:
 
-* Sign in using Google OAuth
-* Create and manage albums
-* Upload and organize images
-* Add tags to photos
-* Filter photos using tags
-* Mark photos as favorites
-* Add comments to photos
-* Share albums with other users
-* Access protected images through authenticated APIs
+* Create albums
+* View accessible albums
+* Update album information
+* Delete albums
+* Share albums
+* Revoke album access
 
-The application separates **authentication** from **authorization**.
+Each album contains ownership information:
 
-Authentication verifies who the user is, while authorization determines what that user is allowed to access or modify.
+```text
+Album
+├── albumId
+├── name
+├── description
+├── ownerId
+├── sharedUsers
+├── createdAt
+└── updatedAt
+```
 
 ---
 
-## ✨ Features
+# Image Management
 
-### 🔐 Authentication
+Users can upload images into albums.
 
-* Google OAuth 2.0 authentication
-* JWT-based authentication
-* Protected API routes
-* Protected frontend routes
-* Persistent authentication state
-* Logout functionality
-* Authenticated user information
-
-### 📁 Album Management
-
-* Create albums
-* View all accessible albums
-* Update album name and description
-* Delete albums
-* Album ownership tracking
-* Album sharing through email
-
-### 🖼️ Image Management
-
-* Upload images to albums
-* Supported formats:
-
-  * JPEG
-  * PNG
-  * WebP
-* Maximum file size: **5 MB**
-* Protected image serving
-* Image metadata storage
-* Delete images
-* Responsive image gallery
-
-### ⭐ Favorites
-
-* Mark images as favorites
-* Remove images from favorites
-* Dedicated Favorites page
-* Favorite photos across accessible albums
-
-### 🏷️ Tags & Filtering
-
-* Add tags while managing photos
-* Store tags in normalized lowercase format
-* Filter album images by tags
-* Support multiple tag filters
-
-Example:
+Supported formats:
 
 ```text
-GET /albums/:albumId/images?tags=travel,nature
+JPEG
+PNG
+WebP
 ```
 
-Multiple tags are handled using an AND-based filter.
+Maximum file size:
 
-### 💬 Comments
-
-* Add comments to images
-* Validate empty comments
-* Maximum comment length of 500 characters
-* Comments remain associated with their images
-
-### 👥 Album Sharing
-
-Albums can be shared with users through their email addresses.
-
-Example request:
-
-```json
-{
-  "emails": [
-    "user1@gmail.com",
-    "user2@gmail.com"
-  ]
-}
+```text
+5 MB
 ```
 
-Shared users can access permitted album resources according to the backend authorization rules.
+The backend validates:
 
-### 🛡️ Authorization
+* File type
+* File size
+* Upload errors
+* Album ownership
+* Image-to-album relationship
 
-The backend uses middleware to enforce resource-level permissions.
+Images are stored with generated filenames instead of relying on the original filename.
 
-#### Album Owner
+---
+
+# Protected Image Access
+
+One of the important engineering aspects of KaviosPix is that image files are not treated as unrestricted public resources.
+
+A request to retrieve an image goes through multiple validation layers:
+
+```text
+Client
+  │
+  ▼
+JWT Authentication
+  │
+  ▼
+Album Access Check
+  │
+  ▼
+Image Belongs to Album?
+  │
+  ▼
+Serve Image
+```
+
+For example:
+
+```http
+GET /albums/:albumId/images/:imageId/file
+```
+
+The backend verifies:
+
+1. The user has a valid JWT.
+2. The album exists.
+3. The user owns or has access to the album.
+4. The image belongs to that album.
+5. Only then is the image served.
+
+This prevents a user from accessing an image simply by knowing an image ID.
+
+---
+
+# Album Authorization
+
+KaviosPix implements resource-level authorization.
+
+There are two major access levels.
+
+## Album Owner
 
 The album owner can:
 
 * Update the album
 * Delete the album
 * Share the album
+* Revoke sharing
 * Upload images
 * Delete images
 * Add comments
+* Delete comments
 * View images
-* Mark images as favorites
+* Manage favorites
 
-#### Shared User
+## Shared User
 
-A shared user can access permitted album resources such as:
+A shared user can access permitted album resources without becoming the owner.
 
-* View album images
-* View protected images
-* Mark images as favorites
-* Use supported image filtering
+For example:
 
-Owner-only operations remain protected by backend authorization middleware.
+```text
+Owner
+  │
+  ├── Full album management
+  ├── Upload images
+  ├── Delete images
+  ├── Share album
+  └── Manage album
+       
+Shared User
+  │
+  ├── View permitted images
+  ├── Access protected images
+  └── Manage supported photo interactions
+```
+
+The authorization decision is made by the backend.
+
+The frontend UI is not treated as a security boundary.
 
 ---
 
-# 🏗️ Architecture
+# Authorization Middleware
 
-KaviosPix follows a client-server architecture.
+The backend separates authentication and authorization into reusable middleware.
 
-```text
-                         ┌─────────────────────┐
-                         │      React UI       │
-                         │                     │
-                         │ Pages / Components  │
-                         │ Context / Router    │
-                         └──────────┬──────────┘
-                                    │
-                                    │ Axios
-                                    │ JWT
-                                    ▼
-                         ┌─────────────────────┐
-                         │    Express API      │
-                         │                     │
-                         │ Routes              │
-                         │ Controllers         │
-                         │ Middleware          │
-                         └──────────┬──────────┘
-                                    │
-                   ┌────────────────┼────────────────┐
-                   │                │                │
-                   ▼                ▼                ▼
-              Authentication   Authorization     File Upload
-                   │                │                │
-                   ▼                ▼                ▼
-                JWT/Auth       Album Access       Multer
-                                    │
-                                    ▼
-                              ┌─────────────┐
-                              │   MongoDB   │
-                              │             │
-                              │ Users       │
-                              │ Albums      │
-                              │ Images      │
-                              └─────────────┘
-```
+### `authenticate`
 
----
-
-# 🔒 Protected Image Access
-
-Images are not exposed as unrestricted public resources.
-
-When a user requests an image, the request passes through authentication and authorization middleware.
+Responsible for:
 
 ```text
-Client
-  │
-  │ GET /albums/:albumId/images/:imageId/file
-  ▼
-authenticate
-  │
-  │ Verify JWT
-  ▼
-requireAlbumAccess
-  │
-  │ Owner or shared user?
-  ▼
-requireImageInAlbum
-  │
-  │ Does image belong to album?
-  ▼
-serveImage
-  │
-  ▼
-Protected Image
+Read Authorization Header
+        ↓
+Extract JWT
+        ↓
+Verify JWT
+        ↓
+Find User
+        ↓
+req.user
 ```
 
-This ensures that knowing an image ID alone is not sufficient to access the image.
+### `requireAlbumOwner`
 
----
-
-# 🔐 Authentication Flow
-
-KaviosPix uses Google OAuth for user authentication.
+Checks whether:
 
 ```text
-User
- │
- │ Sign in with Google
- ▼
-/auth/google
- │
- ▼
-Google OAuth
- │
- ▼
-/auth/google/callback
- │
- ▼
-Passport
- │
- ▼
-User authentication
- │
- ▼
-JWT generation
- │
- ▼
-Frontend callback
- │
- ▼
-Store authentication data
- │
- ▼
-Protected React routes
+req.user.userId === album.ownerId
 ```
 
-Authenticated API requests include the JWT:
+If the user is not the owner:
 
 ```http
-Authorization: Bearer <JWT>
+403 Forbidden
 ```
 
-The backend authentication middleware:
+### `requireAlbumAccess`
 
-1. Reads the Authorization header.
-2. Validates the Bearer token.
-3. Verifies the JWT.
-4. Finds the corresponding user.
-5. Attaches the authenticated user to `req.user`.
+Allows access when:
+
+```text
+User is Owner
+      OR
+User exists in sharedUsers
+```
+
+Otherwise:
+
+```http
+403 Forbidden
+```
+
+### `requireImageInAlbum`
+
+Ensures that the requested image actually belongs to the requested album.
+
+This protects against cross-album resource access.
 
 ---
 
-# 📡 API Overview
+# Tags and Filtering
+
+Images can be organized using tags.
+
+Example:
+
+```text
+travel
+nature
+friends
+college
+vacation
+```
+
+Tags can be used to filter album images.
+
+Example:
+
+```http
+GET /albums/:albumId/images?tags=travel,nature
+```
+
+Multiple tags can be processed as an AND-based filter.
+
+---
+
+# Favorites
+
+Users can mark images as favorites.
+
+Features include:
+
+* Add to favorites
+* Remove from favorites
+* View favorite images
+* Maintain favorite state per image
+
+A dedicated Favorites page provides a centralized view of favorite photos.
+
+---
+
+# Comments
+
+Users can add comments to supported images.
+
+Comment validation includes:
+
+* Empty comment prevention
+* Maximum length validation
+* Image relationship validation
+* Authorization checks
+
+Example:
+
+```text
+Image
+ ├── Comment
+ │    ├── User
+ │    ├── Text
+ │    └── Timestamp
+```
+
+---
+
+# API Design
+
+The backend follows a resource-oriented REST API structure.
 
 ## Authentication
 
@@ -289,6 +383,7 @@ GET    /albums
 PUT    /albums/:albumId
 DELETE /albums/:albumId
 POST   /albums/:albumId/share
+DELETE /albums/:albumId/share
 ```
 
 ## Images
@@ -297,115 +392,260 @@ POST   /albums/:albumId/share
 POST   /albums/:albumId/images
 GET    /albums/:albumId/images
 GET    /albums/:albumId/images/favorites
+
 PUT    /albums/:albumId/images/:imageId/favorite
+
 POST   /albums/:albumId/images/:imageId/comments
+
+DELETE /albums/:albumId/images/:imageId/comments/:commentId
+
 DELETE /albums/:albumId/images/:imageId
+
 GET    /albums/:albumId/images/:imageId/file
 ```
 
 ---
 
-# 🧩 Backend Middleware
+# Architecture
 
-The backend uses middleware to keep authentication and authorization logic separate from controllers.
-
-### `authenticate`
-
-Verifies the JWT and identifies the current user.
+KaviosPix follows a client-server architecture.
 
 ```text
-Request
-   ↓
-JWT verification
-   ↓
-Find User
-   ↓
-req.user
-```
-
-### `requireAlbumOwner`
-
-Checks whether the authenticated user owns the requested album.
-
-```text
-req.user.userId
-       │
-       ▼
-album.ownerId
-       │
-       ├── Match → Continue
-       │
-       └── No match → 403
-```
-
-### `requireAlbumAccess`
-
-Allows access when the user is either:
-
-* The album owner
-* A user included in the album's shared users
-
-### `requireImageInAlbum`
-
-Ensures that the requested image actually belongs to the requested album.
-
-This prevents accessing an image through an unrelated album ID.
-
----
-
-# 📂 Project Structure
-
-```text
-KaviosPix/
-│
-├── backend/
-│   ├── src/
-│   │   ├── controllers/
-│   │   ├── middleware/
-│   │   ├── models/
-│   │   ├── routes/
-│   │   ├── config/
-│   │   ├── app.js
-│   │   └── server.js
-│   │
-│   ├── uploads/
-│   ├── .env
-│   └── package.json
-│
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── albums/
-│   │   │   ├── images/
-│   │   │   └── common/
-│   │   │
-│   │   ├── context/
-│   │   ├── hooks/
-│   │   ├── pages/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   ├── main.jsx
-│   │   └── index.css
-│   │
-│   ├── .env
-│   └── package.json
-│
-└── README.md
+┌──────────────────────────┐
+│        React UI          │
+│                          │
+│ Pages                    │
+│ Components               │
+│ Context API              │
+│ Protected Routes         │
+└────────────┬─────────────┘
+             │
+             │ Axios / HTTP
+             │ JWT
+             ▼
+┌──────────────────────────┐
+│      Express API         │
+│                          │
+│ Routes                   │
+│ Controllers              │
+│ Middleware               │
+│ Error Handling           │
+└────────────┬─────────────┘
+             │
+       ┌─────┼──────────────┐
+       │     │              │
+       ▼     ▼              ▼
+   MongoDB  JWT/OAuth     Multer
+       │                    │
+       ▼                    ▼
+   Users / Albums /      Image Files
+      Images
 ```
 
 ---
 
-# 🛠️ Tech Stack
+# Frontend Architecture
+
+The React application is divided into reusable responsibilities.
+
+```text
+frontend/
+│
+├── src/
+│   ├── components/
+│   │   ├── albums/
+│   │   ├── images/
+│   │   └── common/
+│   │
+│   ├── context/
+│   │
+│   ├── pages/
+│   │
+│   ├── routes/
+│   │
+│   ├── services/
+│   │
+│   ├── App.jsx
+│   └── main.jsx
+```
+
+Important frontend areas include:
+
+```text
+components/
+  ↓
+Reusable UI
+
+pages/
+  ↓
+Application screens
+
+services/
+  ↓
+API communication
+
+context/
+  ↓
+Authentication state
+
+routes/
+  ↓
+Navigation and protected routes
+```
+
+---
+
+# Backend Architecture
+
+The backend follows a layered structure.
+
+```text
+backend/
+│
+├── src/
+│   ├── config/
+│   ├── controllers/
+│   ├── middleware/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── app.js
+│   └── server.js
+```
+
+### Controllers
+
+Business logic is separated into controllers:
+
+```text
+auth.controller.js
+album.controller.js
+image.controller.js
+user.controller.js
+```
+
+### Middleware
+
+Security and request processing are separated into middleware:
+
+```text
+auth.middleware.js
+album.middleware.js
+albumAccess.middleware.js
+image.middleware.js
+upload.middleware.js
+error.middleware.js
+notFound.middleware.js
+```
+
+### Models
+
+MongoDB data models include:
+
+```text
+User
+Album
+Image
+```
+
+---
+
+# Data Model
+
+## User
+
+```text
+User
+├── userId
+├── googleId
+├── email
+├── createdAt
+└── updatedAt
+```
+
+## Album
+
+```text
+Album
+├── albumId
+├── name
+├── description
+├── ownerId
+├── sharedUsers[]
+├── createdAt
+└── updatedAt
+```
+
+## Image
+
+```text
+Image
+├── imageId
+├── albumId
+├── filename
+├── originalName
+├── tags[]
+├── favorites
+├── comments[]
+└── timestamps
+```
+
+The application uses UUID-style identifiers for application-level resources.
+
+---
+
+# File Upload Pipeline
+
+Image uploads use Multer.
+
+```text
+Frontend
+  │
+  │ multipart/form-data
+  ▼
+Express Route
+  │
+  ▼
+Authentication
+  │
+  ▼
+Album Ownership Check
+  │
+  ▼
+Multer
+  │
+  ├── File Type Validation
+  │
+  ├── File Size Validation
+  │
+  └── Unique Filename
+  │
+  ▼
+Image Controller
+  │
+  ▼
+MongoDB Metadata
+```
+
+Only the following MIME types are accepted:
+
+```text
+image/jpeg
+image/png
+image/webp
+```
+
+---
+
+# Tech Stack
 
 ## Frontend
 
-* React.js
+* React 19
 * Vite
 * React Router
-* Bootstrap 5
 * Axios
+* Bootstrap 5
 * Context API
 
 ## Backend
@@ -419,7 +659,7 @@ KaviosPix/
 * Google OAuth 2.0
 * Multer
 
-## Development Tools
+## Development
 
 * Git
 * GitHub
@@ -429,7 +669,46 @@ KaviosPix/
 
 ---
 
-# ⚙️ Environment Variables
+# Project Structure
+
+```text
+KaviosPix/
+│
+├── backend/
+│   ├── src/
+│   │   ├── config/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── models/
+│   │   ├── routes/
+│   │   ├── utils/
+│   │   ├── app.js
+│   │   └── server.js
+│   │
+│   └── package.json
+│
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── albums/
+│   │   │   ├── images/
+│   │   │   └── common/
+│   │   │
+│   │   ├── context/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   └── package.json
+│
+└── README.md
+```
+
+---
+
+# Environment Variables
 
 ## Backend
 
@@ -455,10 +734,6 @@ GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_CALLBACK_URL=http://localhost:5000/auth/google/callback
 ```
 
-Do not commit real credentials or secrets to GitHub.
-
----
-
 ## Frontend
 
 Create:
@@ -473,89 +748,44 @@ Example:
 VITE_API_BASE_URL=http://localhost:5000
 ```
 
+Never commit real credentials or secrets.
+
 ---
 
-# 🚀 Getting Started
+# Getting Started
 
-## 1. Clone the repository
+## 1. Clone
 
 ```bash
 git clone https://github.com/sunny-raj-sah/KaviosPix.git
-```
-
-```bash
 cd KaviosPix
 ```
 
----
-
-## 2. Install backend dependencies
+## 2. Backend
 
 ```bash
 cd backend
 npm install
-```
-
----
-
-## 3. Configure backend environment variables
-
-Create:
-
-```text
-backend/.env
-```
-
-and add the required MongoDB, JWT, and Google OAuth credentials.
-
----
-
-## 4. Start the backend
-
-```bash
 npm run dev
 ```
 
-The backend will run on:
+Backend:
 
 ```text
 http://localhost:5000
 ```
 
----
-
-## 5. Install frontend dependencies
+## 3. Frontend
 
 Open another terminal:
 
 ```bash
 cd frontend
 npm install
-```
-
----
-
-## 6. Configure frontend environment
-
-Create:
-
-```text
-frontend/.env
-```
-
-```env
-VITE_API_BASE_URL=http://localhost:5000
-```
-
----
-
-## 7. Start the frontend
-
-```bash
 npm run dev
 ```
 
-The frontend will normally run on:
+Frontend:
 
 ```text
 http://localhost:5173
@@ -563,69 +793,116 @@ http://localhost:5173
 
 ---
 
-# 🧪 Testing
+# Google OAuth Configuration
 
-The APIs can be tested using Postman.
+The application requires Google OAuth credentials.
 
-Important flows to test:
-
-### Authentication
+Configure the Google OAuth application with the backend callback:
 
 ```text
-Google Login
-       ↓
-JWT
-       ↓
-Protected API
+http://localhost:5000/auth/google/callback
 ```
 
-### Album
+The frontend handles the authentication callback and stores the returned authentication information before navigating into the protected application.
+
+---
+
+# Engineering Challenges
+
+## 1. Separating Authentication and Authorization
+
+A major design consideration was avoiding the assumption that a logged-in user automatically has access to every resource.
+
+The application therefore uses two separate concepts:
 
 ```text
-Create
-  ↓
-Read
-  ↓
-Update
-  ↓
-Delete
-```
-
-### Image
-
-```text
-Upload
-  ↓
-View
-  ↓
-Favorite
-  ↓
-Comment
-  ↓
-Delete
-```
-
-### Authorization
-
-Test both:
-
-```text
-Album Owner
+Authentication
+      ↓
+Is the user logged in?
 ```
 
 and:
 
 ```text
-Shared User
+Authorization
+      ↓
+Can this user access this specific album?
 ```
-
-to verify that owner-only operations are rejected for users who do not own the album.
 
 ---
 
-# 📚 What I Learned
+## 2. Protecting Images
 
-Building KaviosPix helped me understand how a complete full-stack application works beyond individual CRUD APIs.
+Serving image files directly without authorization could allow unauthorized users to access private images.
+
+The solution was to protect the image endpoint itself.
+
+```text
+JWT
+ ↓
+Album Access
+ ↓
+Image Ownership / Relationship
+ ↓
+Serve File
+```
+
+---
+
+## 3. Owner vs Shared User Permissions
+
+Album sharing introduced different permission levels.
+
+The backend therefore distinguishes:
+
+```text
+Owner
+```
+
+from:
+
+```text
+Shared User
+```
+
+This prevents a shared user from automatically gaining owner privileges.
+
+---
+
+## 4. File Validation
+
+Uploaded files cannot be trusted simply because the frontend validates them.
+
+The backend independently validates:
+
+```text
+File Type
+File Size
+Upload Errors
+```
+
+This provides defense at the API layer.
+
+---
+
+## 5. Resource Relationship Validation
+
+An image request contains both:
+
+```text
+albumId
+imageId
+```
+
+The backend verifies that the requested image actually belongs to the requested album.
+
+This prevents an image belonging to one album from being accessed through another album's route.
+
+---
+
+# What I Learned
+
+Building KaviosPix strengthened my understanding of full-stack application architecture.
 
 ### React
 
@@ -633,149 +910,124 @@ Building KaviosPix helped me understand how a complete full-stack application wo
 * React Router
 * Protected routes
 * Context API
-* Authentication state management
+* Authentication state
 * Reusable components
+* API integration
 * Form handling
 * Loading and error states
-* API integration with Axios
-* Responsive UI with Bootstrap
 
-### Backend
+### Node.js / Express
 
-* Express.js routing
-* Controller-service separation
-* Middleware architecture
-* JWT authentication
-* Google OAuth
-* Authorization
-* Resource-level permissions
-* Multipart file uploads
-* File validation
-* Protected file serving
+* REST API design
+* Middleware composition
+* Controllers
+* Authentication middleware
+* Authorization middleware
+* Error handling
+* Multipart uploads
+* Protected resource serving
 
 ### MongoDB
 
-* Mongoose models
-* Document relationships
+* Mongoose schemas
+* Resource relationships
+* Indexed identifiers
+* Array-based sharing relationships
 * Query filtering
-* Updating nested data
-* Working with UUID-style identifiers
+* Updating nested resources
+
+### Authentication
+
+* Google OAuth
+* Passport.js
+* JWT generation
+* JWT verification
+* Bearer authentication
+* Frontend authentication state
 
 ### Security
 
-I learned the difference between:
+Most importantly, I learned that:
 
 ```text
-Authentication
-"Who are you?"
-```
-
-and:
-
-```text
-Authorization
-"What are you allowed to access?"
-```
-
-I also learned why frontend restrictions alone are not sufficient for security.
-
-For example:
-
-```text
-Frontend hides Delete button
+Frontend restriction
         ≠
-Secure API
+Backend security
 ```
 
-The backend must independently verify permissions:
+For example, hiding a Delete button does not secure the API.
+
+The backend must still perform:
 
 ```text
-Request
-  ↓
 Authenticate
-  ↓
+     ↓
 Authorize
-  ↓
-Controller
+     ↓
+Validate Resource
+     ↓
+Execute Operation
 ```
-
-### API Design
-
-I learned how to design APIs around resources:
-
-```text
-/auth
-/albums
-/albums/:albumId
-/albums/:albumId/images
-/albums/:albumId/images/:imageId
-```
-
-and how middleware can be composed for different authorization requirements.
-
-### Debugging
-
-During development I worked through issues involving:
-
-* React state updates
-* Protected routes
-* API response shapes
-* JWT authentication
-* Middleware ordering
-* File uploads
-* Protected image resources
-* Component separation
-* Frontend/backend integration
 
 ---
 
-# 🎯 Project Goals
+# Future Improvements
 
-The main goals of KaviosPix are:
-
-* Build a practical full-stack application
-* Implement real authentication and authorization
-* Work with protected resources
-* Understand file upload and serving
-* Practice API design
-* Build reusable React components
-* Implement resource-level permissions
-* Develop a production-oriented project structure
-
----
-
-# 🔮 Future Improvements
-
-Potential future improvements include:
+Potential improvements include:
 
 * Cloud image storage
 * Image thumbnails
-* Image search
 * Pagination
 * Infinite scrolling
+* Image search
 * Album cover images
-* Better image preview/lightbox
-* Comment management
+* Improved image preview
 * More granular sharing permissions
 * Image metadata extraction
 * Automated testing
 * API documentation
-* Production deployment
-* Improved caching and performance
+* Better caching
+* Production monitoring
+* Improved upload performance
 
 ---
 
-# 👨‍💻 Author
+# Project Status
+
+KaviosPix is an actively developed full-stack project focused on:
+
+```text
+React
++
+Node.js
++
+Express
++
+MongoDB
++
+OAuth
++
+JWT
++
+Authorization
++
+File Management
+```
+
+The project demonstrates how authentication, authorization, file handling, and resource-level security can be combined into a practical full-stack application.
+
+---
+
+# Author
 
 **Sunny Raj**
 
-* GitHub: https://github.com/sunny-raj-sah
-* LinkedIn: https://www.linkedin.com/in/sunny-raj-885588313/
+GitHub:
+https://github.com/sunny-raj-sah
+
+LinkedIn:
+https://www.linkedin.com/in/sunny-raj-885588313/
 
 ---
-
-## 📌 Project Status
-
-KaviosPix is an actively developed full-stack project focused on learning and implementing real-world authentication, authorization, image management, and React application architecture.
 
 > **KaviosPix — Organize. Protect. Share.**
