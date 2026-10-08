@@ -399,7 +399,7 @@ function ImageCard({
   };
 
   return (
-    <div className="col-6 col-md-4 col-lg-3">
+    <div className="col-12 col-md-4 col-lg-3">
       <div className="card border-0 shadow-sm h-100 overflow-hidden">
 
         {/* Image */}
@@ -435,23 +435,33 @@ function ImageCard({
 
           {/* Image name + actions */}
           <div className="d-flex justify-content-between align-items-start gap-2">
-            <h6
+            {/* <h6
               className="card-title mb-2 text-truncate"
               title={image.name || "Image"}
             >
               {image.name || "Image"}
-            </h6>
-
+            </h6> */}
+     <h6
+  className="card-title mb-2 text-truncate flex-grow-1"
+  style={{ minWidth: 0 }}
+  title={image.name || "Image"}
+>
+  {image.name || "Image"}
+</h6>
             <div className="d-flex gap-1 flex-shrink-0">
 
               {/* Favorite */}
               <button
                 type="button"
-                className={`btn btn-sm ${
+                className={`btn  ${
                   isFavorite
                     ? "btn-warning"
                     : "btn-outline-secondary"
                 }`}
+                  style={{
+    minWidth: "44px",
+    minHeight: "44px",
+  }}
                 onClick={() =>
                   onToggleFavorite(
                     imageId,
@@ -482,7 +492,11 @@ function ImageCard({
               {isAlbumOwner && (
                 <button
                   type="button"
-                  className="btn btn-sm btn-outline-danger"
+                  className="btn  btn-outline-danger"
+                   style={{
+    minWidth: "44px",
+    minHeight: "44px",
+  }}
                   onClick={() => {
                     const confirmed = window.confirm(
                       "Are you sure you want to delete this image?"

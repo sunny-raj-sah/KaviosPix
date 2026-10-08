@@ -236,7 +236,7 @@ function ImageComments({
               disabled={addingComment}
             />
 
-            <div className="d-flex justify-content-between mt-1">
+            {/* <div className="d-flex justify-content-between mt-1">
               <small className="text-secondary">
                 Maximum 500 characters
               </small>
@@ -244,7 +244,16 @@ function ImageComments({
               <small className="text-secondary">
                 {comment.length}/500
               </small>
-            </div>
+            </div> */}
+            <div className="d-flex justify-content-between align-items-center mt-1 gap-2">
+  <small className="text-secondary text-nowrap">
+    Maximum 500 characters
+  </small>
+
+  <small className="text-secondary text-nowrap">
+    {comment.length}/500
+  </small>
+</div>
           </div>
 
           <button
