@@ -129,6 +129,7 @@ function ImageGallery({
   deletingImage,
     onDeleteComment,
   deletingComment,
+   uploadButtonRef,
 }) {
   return (
     <>
@@ -174,6 +175,7 @@ function ImageGallery({
             </p>
 
             <button
+             ref={uploadButtonRef}
               type="button"
               className="btn btn-primary"
               onClick={onUpload}
