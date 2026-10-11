@@ -132,7 +132,6 @@
 
 // export default ImageCard;
 
-
 // -------------------------------------------------------------
 
 // import ImageComments from "./ImageComments";
@@ -348,11 +347,262 @@
 // export default ImageCard;
 // ----------------------------------------------------------------------
 // 3
- import { useState } from "react";
+// import { useState } from "react";
+// import ImageComments from "./ImageComments";
+
+// function ImageCard({
+//   image,
+//   imageUrl,
+//   onToggleFavorite,
+//   updatingFavorite,
+//   onAddComment,
+//   addingComment,
+//   isAlbumOwner,
+//   onDeleteImage,
+//   deletingImage,
+//   onDeleteComment,
+//   deletingComment,
+// }) {
+//   const [showComments, setShowComments] = useState(false);
+
+//   const imageId = image.imageId || image._id;
+
+//   const isFavorite = Boolean(image.isFavorite);
+
+//   const comments = Array.isArray(image.comments) ? image.comments : [];
+
+//   const formatFileSize = (bytes) => {
+//     if (!bytes) {
+//       return "Unknown size";
+//     }
+
+//     if (bytes < 1024) {
+//       return `${bytes} B`;
+//     }
+
+//     if (bytes < 1024 * 1024) {
+//       return `${(bytes / 1024).toFixed(1)} KB`;
+//     }
+
+//     return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+//   };
+
+//   const formatDate = (date) => {
+//     if (!date) {
+//       return "Unknown date";
+//     }
+
+//     return new Date(date).toLocaleDateString();
+//   };
+
+//   return (
+//     <div className="col-12 col-md-4 col-lg-3">
+//       <div className="card border-0 shadow-sm h-100 overflow-hidden">
+//         {/* Image */}
+//         {imageUrl ? (
+//           <img
+//             src={imageUrl}
+//             alt={image.name || "Album image"}
+//             className="w-100"
+//             style={{
+//               height: "220px",
+//               objectFit: "cover",
+//             }}
+//           />
+//         ) : (
+//           <div
+//             className="bg-light d-flex align-items-center justify-content-center"
+//             style={{
+//               height: "220px",
+//             }}
+//           >
+//             <div className="spinner-border text-secondary" role="status">
+//               <span className="visually-hidden">Loading image...</span>
+//             </div>
+//           </div>
+//         )}
+
+//         <div className="card-body p-3">
+//           {/* Image name + actions */}
+//           <div className="d-flex justify-content-between align-items-start gap-2">
+//             {/* <h6
+//               className="card-title mb-2 text-truncate"
+//               title={image.name || "Image"}
+//             >
+//               {image.name || "Image"}
+//             </h6> */}
+//             <h6
+//               className="card-title mb-2 text-truncate flex-grow-1"
+//               style={{ minWidth: 0 }}
+//               title={image.name || "Image"}
+//             >
+//               {image.name || "Image"}
+//             </h6>
+//             <div className="d-flex gap-1 flex-shrink-0">
+//               {/* Favorite */}
+//               <button
+//                 type="button"
+//                 className={`btn  ${
+//                   isFavorite ? "btn-warning" : "btn-outline-secondary"
+//                 }`}
+//                 style={{
+//                   minWidth: "44px",
+//                   minHeight: "44px",
+//                 }}
+//                 onClick={() => onToggleFavorite(imageId, !isFavorite)}
+//                 disabled={updatingFavorite === imageId}
+//                 title={
+//                   isFavorite ? "Remove from favorites" : "Add to favorites"
+//                 }
+//               >
+//                 {updatingFavorite === imageId ? (
+//                   <span
+//                     className="spinner-border spinner-border-sm"
+//                     role="status"
+//                     aria-hidden="true"
+//                   />
+//                 ) : (
+//                   "★"
+//                 )}
+//               </button>
+
+//               {/* Delete */}
+//               {isAlbumOwner && (
+//                 <button
+//                   type="button"
+//                   className="btn  btn-outline-danger"
+//                   style={{
+//                     minWidth: "44px",
+//                     minHeight: "44px",
+//                   }}
+//                   onClick={() => {
+//                     const confirmed = window.confirm(
+//                       "Are you sure you want to delete this image?",
+//                     );
+
+//                     if (confirmed) {
+//                       onDeleteImage(imageId);
+//                     }
+//                   }}
+//                   disabled={deletingImage === imageId}
+//                   title="Delete image"
+//                 >
+//                   {deletingImage === imageId ? (
+//                     <span
+//                       className="spinner-border spinner-border-sm"
+//                       role="status"
+//                       aria-hidden="true"
+//                     />
+//                   ) : (
+//                     "🗑"
+//                   )}
+//                 </button>
+//               )}
+//             </div>
+//           </div>
+
+//           {/* Person */}
+//           <div className="small text-secondary mb-1 text-truncate">
+//             <span className="fw-semibold">Person:</span>{" "}
+//             {image.person || "Not specified"}
+//           </div>
+
+//           {/* File information */}
+//           <div className="small text-secondary mb-1 text-truncate">
+//             {image.mimeType || "Unknown type"}
+//             {" · "}
+//             {formatFileSize(image.size)}
+//           </div>
+
+//           {/* Upload date */}
+//           <div className="small text-secondary mb-2">
+//             Uploaded: {formatDate(image.uploadedAt)}
+//           </div>
+
+//           {/* Tags */}
+//           <div className="mb-2">
+//             {image.tags?.length ? (
+//               <div className="d-flex flex-wrap gap-1">
+//                 {image.tags.map((tag, index) => (
+//                   <span
+//                     key={`${tag}-${index}`}
+//                     className="badge text-bg-light border"
+//                   >
+//                     #{tag}
+//                   </span>
+//                 ))}
+//               </div>
+//             ) : (
+//               <span className="small text-secondary">No tags</span>
+//             )}
+//           </div>
+
+//           {/* Favorite indicator */}
+//           {/* {isFavorite && (
+//             <span className="badge text-bg-warning mb-2">
+//               ★ Favorite
+//             </span>
+//           )} */}
+
+//           {/* Comments toggle */}
+//           <button
+//             type="button"
+//             className="btn btn-sm btn-outline-secondary w-100 mt-1"
+//             onClick={() => setShowComments((current) => !current)}
+//           >
+//             💬 {comments.length}{" "}
+//             {comments.length === 1 ? "Comment" : "Comments"}
+//             <span className="ms-1">{showComments ? "▲" : "▼"}</span>
+//           </button>
+
+//           {/* Comments section */}
+//           {showComments && (
+//             <div className="mt-3 pt-3 border-top">
+//               {/* <ImageComments
+//                 comments={comments}
+//                 onAddComment={(comment) =>
+//                   onAddComment(
+//                     imageId,
+//                     comment
+//                   )
+//                 }
+//                 addingComment={
+//                   addingComment === imageId
+//                 }
+//                 isAlbumOwner={
+//                   isAlbumOwner
+//                 }
+//               /> */}
+//               <ImageComments
+//                 comments={comments}
+//                 onAddComment={(comment) => onAddComment(imageId, comment)}
+//                 addingComment={addingComment === imageId}
+//                 isAlbumOwner={isAlbumOwner}
+//                 onDeleteComment={(commentIndex) =>
+//                   onDeleteComment(imageId, commentIndex)
+//                 }
+//                 deletingComment={
+//                   deletingComment?.imageId === imageId
+//                     ? deletingComment.commentIndex
+//                     : null
+//                 }
+//               />
+//             </div>
+//           )}
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default ImageCard;
+// -----------------------------------------------------------------
+
+import { useState } from "react";
 import ImageComments from "./ImageComments";
 
 function ImageCard({
- image,
+  image,
   imageUrl,
   onToggleFavorite,
   updatingFavorite,
@@ -367,7 +617,6 @@ function ImageCard({
   const [showComments, setShowComments] = useState(false);
 
   const imageId = image.imageId || image._id;
-
   const isFavorite = Boolean(image.isFavorite);
 
   const comments = Array.isArray(image.comments)
@@ -375,7 +624,7 @@ function ImageCard({
     : [];
 
   const formatFileSize = (bytes) => {
-    if (!bytes) {
+    if (bytes == null || bytes === 0) {
       return "Unknown size";
     }
 
@@ -387,91 +636,115 @@ function ImageCard({
       return `${(bytes / 1024).toFixed(1)} KB`;
     }
 
-    return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
+    return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
   };
 
   const formatDate = (date) => {
-    if (!date) {
-      return "Unknown date";
-    }
+    if (!date) return "Unknown date";
 
-    return new Date(date).toLocaleDateString();
+    const parsedDate = new Date(date);
+
+    return Number.isNaN(parsedDate.getTime())
+      ? "Unknown date"
+      : parsedDate.toLocaleDateString();
+  };
+
+  const handleDeleteImage = () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this image?"
+    );
+
+    if (confirmed) {
+      onDeleteImage(imageId);
+    }
   };
 
   return (
-    <div className="col-12 col-md-4 col-lg-3">
+    <div className="col-12 col-sm-6 col-lg-4 col-xl-3 mb-3">
       <div className="card border-0 shadow-sm h-100 overflow-hidden">
-
-        {/* Image */}
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={image.name || "Album image"}
-            className="w-100"
-            style={{
-              height: "220px",
-              objectFit: "cover",
-            }}
-          />
-        ) : (
-          <div
-            className="bg-light d-flex align-items-center justify-content-center"
-            style={{
-              height: "220px",
-            }}
-          >
-            <div
-              className="spinner-border text-secondary"
-              role="status"
-            >
-              <span className="visually-hidden">
+        {/* Responsive image */}
+        <div
+          className="d-flex align-items-center justify-content-center bg-light overflow-hidden"
+          style={{
+            width: "100%",
+            height: "220px",
+          }}
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={image.name || "Album image"}
+              loading="lazy"
+              style={{
+                display: "block",
+                width: "100%",
+                height: "100%",
+                objectFit: "contain",
+                objectPosition: "center",
+              }}
+              onError={() => {
+                console.error(
+                  "Failed to load image:",
+                  imageUrl
+                );
+              }}
+            />
+          ) : (
+            <div className="text-center text-secondary p-3">
+              <div
+                className="spinner-border spinner-border-sm"
+                role="status"
+              >
+                <span className="visually-hidden">
+                  Loading image...
+                </span>
+              </div>
+              <div className="small mt-2">
                 Loading image...
-              </span>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
+        {/* Card body */}
         <div className="card-body p-3">
-
-          {/* Image name + actions */}
-          <div className="d-flex justify-content-between align-items-start gap-2">
-            {/* <h6
-              className="card-title mb-2 text-truncate"
+          {/* Image name and actions */}
+          <div className="d-flex align-items-start gap-2 mb-3">
+            <h6
+              className="card-title mb-0 flex-grow-1 text-break"
+              style={{
+                minWidth: 0,
+                overflowWrap: "anywhere",
+              }}
               title={image.name || "Image"}
             >
               {image.name || "Image"}
-            </h6> */}
-     <h6
-  className="card-title mb-2 text-truncate flex-grow-1"
-  style={{ minWidth: 0 }}
-  title={image.name || "Image"}
->
-  {image.name || "Image"}
-</h6>
-            <div className="d-flex gap-1 flex-shrink-0">
+            </h6>
 
+            <div className="d-flex gap-2 flex-shrink-0">
               {/* Favorite */}
               <button
                 type="button"
-                className={`btn  ${
+                className={`btn ${
                   isFavorite
                     ? "btn-warning"
                     : "btn-outline-secondary"
-                }`}
-                  style={{
-    minWidth: "44px",
-    minHeight: "44px",
-  }}
+                } d-inline-flex align-items-center justify-content-center`}
+                style={{
+                  width: "44px",
+                  height: "44px",
+                  padding: 0,
+                }}
                 onClick={() =>
-                  onToggleFavorite(
-                    imageId,
-                    !isFavorite
-                  )
+                  onToggleFavorite(imageId, !isFavorite)
                 }
-                disabled={
-                  updatingFavorite === imageId
-                }
+                disabled={updatingFavorite === imageId}
                 title={
+                  isFavorite
+                    ? "Remove from favorites"
+                    : "Add to favorites"
+                }
+                aria-label={
                   isFavorite
                     ? "Remove from favorites"
                     : "Add to favorites"
@@ -481,44 +754,34 @@ function ImageCard({
                   <span
                     className="spinner-border spinner-border-sm"
                     role="status"
-                    aria-hidden="true"
                   />
                 ) : (
-                  "★"
+                  <span aria-hidden="true">★</span>
                 )}
               </button>
 
-              {/* Delete */}
+              {/* Delete image */}
               {isAlbumOwner && (
                 <button
                   type="button"
-                  className="btn  btn-outline-danger"
-                   style={{
-    minWidth: "44px",
-    minHeight: "44px",
-  }}
-                  onClick={() => {
-                    const confirmed = window.confirm(
-                      "Are you sure you want to delete this image?"
-                    );
-
-                    if (confirmed) {
-                      onDeleteImage(imageId);
-                    }
+                  className="btn btn-outline-danger d-inline-flex align-items-center justify-content-center"
+                  style={{
+                    width: "44px",
+                    height: "44px",
+                    padding: 0,
                   }}
-                  disabled={
-                    deletingImage === imageId
-                  }
+                  onClick={handleDeleteImage}
+                  disabled={deletingImage === imageId}
                   title="Delete image"
+                  aria-label="Delete image"
                 >
                   {deletingImage === imageId ? (
                     <span
                       className="spinner-border spinner-border-sm"
                       role="status"
-                      aria-hidden="true"
                     />
                   ) : (
-                    "🗑"
+                    <span aria-hidden="true">🗑️</span>
                   )}
                 </button>
               )}
@@ -526,15 +789,13 @@ function ImageCard({
           </div>
 
           {/* Person */}
-          <div className="small text-secondary mb-1 text-truncate">
-            <span className="fw-semibold">
-              Person:
-            </span>{" "}
+          <div className="small text-secondary mb-2 text-break">
+            <span className="fw-semibold">Person:</span>{" "}
             {image.person || "Not specified"}
           </div>
 
           {/* File information */}
-          <div className="small text-secondary mb-1 text-truncate">
+          <div className="small text-secondary mb-2 text-break">
             {image.mimeType || "Unknown type"}
             {" · "}
             {formatFileSize(image.size)}
@@ -546,13 +807,17 @@ function ImageCard({
           </div>
 
           {/* Tags */}
-          <div className="mb-2">
-            {image.tags?.length ? (
+          <div className="mb-3">
+            {image.tags?.length > 0 ? (
               <div className="d-flex flex-wrap gap-1">
                 {image.tags.map((tag, index) => (
                   <span
                     key={`${tag}-${index}`}
-                    className="badge text-bg-light border"
+                    className="badge text-bg-light border text-break"
+                    style={{
+                      maxWidth: "100%",
+                      overflowWrap: "anywhere",
+                    }}
                   >
                     #{tag}
                   </span>
@@ -565,29 +830,18 @@ function ImageCard({
             )}
           </div>
 
-          {/* Favorite indicator */}
-          {/* {isFavorite && (
-            <span className="badge text-bg-warning mb-2">
-              ★ Favorite
-            </span>
-          )} */}
-
           {/* Comments toggle */}
           <button
             type="button"
-            className="btn btn-sm btn-outline-secondary w-100 mt-1"
+            className="btn btn-outline-secondary w-100 mt-1"
             onClick={() =>
-              setShowComments(
-                (current) => !current
-              )
+              setShowComments((current) => !current)
             }
+            aria-expanded={showComments}
           >
             💬 {comments.length}{" "}
-            {comments.length === 1
-              ? "Comment"
-              : "Comments"}
-
-            <span className="ms-1">
+            {comments.length === 1 ? "Comment" : "Comments"}
+            <span className="ms-2">
               {showComments ? "▲" : "▼"}
             </span>
           </button>
@@ -595,35 +849,22 @@ function ImageCard({
           {/* Comments section */}
           {showComments && (
             <div className="mt-3 pt-3 border-top">
-              {/* <ImageComments
+              <ImageComments
                 comments={comments}
                 onAddComment={(comment) =>
-                  onAddComment(
-                    imageId,
-                    comment
-                  )
+                  onAddComment(imageId, comment)
                 }
-                addingComment={
-                  addingComment === imageId
+                addingComment={addingComment === imageId}
+                isAlbumOwner={isAlbumOwner}
+                onDeleteComment={(commentIndex) =>
+                  onDeleteComment(imageId, commentIndex)
                 }
-                isAlbumOwner={
-                  isAlbumOwner
+                deletingComment={
+                  deletingComment?.imageId === imageId
+                    ? deletingComment.commentIndex
+                    : null
                 }
-              /> */}
-              <ImageComments
-  comments={comments}
-  onAddComment={(comment) =>
-    onAddComment(imageId, comment)
-  }
-  addingComment={addingComment === imageId}
-  isAlbumOwner={isAlbumOwner}
-  onDeleteComment={(commentIndex) =>
-    onDeleteComment(imageId, commentIndex)
-  }
-  deletingComment={deletingComment?.imageId === imageId
-    ? deletingComment.commentIndex
-    : null}
-/>
+              />
             </div>
           )}
         </div>

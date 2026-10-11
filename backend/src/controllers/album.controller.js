@@ -36,23 +36,73 @@ const createAlbum = async (req, res) => {
   }
 };
 
+// const getAlbums = async (req, res) => {
+//   try {
+//     const albums = await Album.find({
+//       $or: [
+//         {
+//           ownerId: req.user.userId,
+//         },
+//         {
+//           sharedUsers: req.user.email,
+//         },
+//       ],
+//     }).sort({ createdAt: -1 });
+
+//     return res.status(200).json({
+//       success: true,
+//       count: albums.length,
+//       data: albums,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch albums",
+//       error: error.message,
+//     });
+//   }
+// };
+
+
 const getAlbums = async (req, res) => {
   try {
     const albums = await Album.find({
       $or: [
-        {
-          ownerId: req.user.userId,
-        },
-        {
-          sharedUsers: req.user.email,
-        },
+        { ownerId: req.user.userId },
+        { sharedUsers: req.user.email.toLowerCase() },
       ],
     }).sort({ createdAt: -1 });
 
+    // Find the owners of all returned albums in one query.
+    const ownerIds = [
+      ...new Set(albums.map((album) => album.ownerId)),
+    ];
+
+    const owners = await User.find({
+      userId: { $in: ownerIds },
+    })
+      .select("userId email")
+      .lean();
+
+    const ownerEmailById = new Map(
+      owners.map((owner) => [owner.userId, owner.email])
+    );
+
+    // Add sharing information without changing the database records.
+    const albumsWithSharingInfo = albums.map((album) => {
+      const albumData = album.toObject();
+
+      return {
+        ...albumData,
+        ownerEmail: ownerEmailById.get(album.ownerId) || null,
+        isSharedWithMe: album.ownerId !== req.user.userId,
+      };
+    });
+
     return res.status(200).json({
       success: true,
-      count: albums.length,
-      data: albums,
+      count: albumsWithSharingInfo.length,
+      data: albumsWithSharingInfo,
     });
   } catch (error) {
     return res.status(500).json({

@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 
 function AlbumHeader({
@@ -6,6 +7,7 @@ function AlbumHeader({
   isAlbumOwner,
   showUploadForm,
   onToggleUpload,
+  uploadButtonRef,
 }) {
   return (
     <>
@@ -63,6 +65,8 @@ function AlbumHeader({
             <div>
                 {isAlbumOwner && (
               <button
+              ref={uploadButtonRef}
+
                 type="button"
                 className="btn btn-primary"
                 onClick={onToggleUpload}

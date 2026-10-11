@@ -1,5 +1,5 @@
  
- import { useEffect, useState } from "react";
+ import { useEffect,useRef,useState } from "react";
 import { Link } from "react-router-dom";
 
 import {
@@ -11,6 +11,9 @@ import {
 
 function Dashboard() {
   const [albums, setAlbums] = useState([]);
+const createAlbumFormRef = useRef(null);
+const albumNameInputRef = useRef(null);
+
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -34,6 +37,32 @@ function Dashboard() {
   const [deletingAlbumId, setDeletingAlbumId] =
     useState(null);
 
+useEffect(() => {
+  if (!showCreateForm) return;
+
+  const timer = window.setTimeout(() => {
+    const formCard = createAlbumFormRef.current;
+    const nameInput = albumNameInputRef.current;
+
+    if (formCard) {
+      const top =
+        formCard.getBoundingClientRect().top +
+        window.scrollY -
+        100;
+
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "smooth",
+      });
+    }
+
+    if (nameInput && !nameInput.disabled) {
+      nameInput.focus();
+    }
+  }, 300);
+
+  return () => window.clearTimeout(timer);
+}, [showCreateForm]);
   // --------------------------------------------------
   // GET ALBUMS
   // --------------------------------------------------
@@ -333,7 +362,8 @@ function Dashboard() {
   // --------------------------------------------------
   // PAGE
   // --------------------------------------------------
-
+ 
+ 
   return (
     <div className="container py-4 py-md-5">
       {/* PAGE HEADER */}
@@ -380,7 +410,9 @@ function Dashboard() {
       {/* CREATE ALBUM CARD */}
 
       {showCreateForm && (
-        <div className="card border-0 shadow-sm mb-4">
+        <div 
+        ref={createAlbumFormRef}
+        className="card border-0 shadow-sm mb-4">
           <div className="card-body p-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
               <div>
@@ -413,6 +445,7 @@ function Dashboard() {
                 </label>
 
                 <input
+                 ref={albumNameInputRef}
                   id="albumName"
                   type="text"
                   className="form-control"
@@ -545,6 +578,53 @@ function Dashboard() {
                         {album.description ||
                           "No description added."}
                       </p>
+                      
+{/* {album.isSharedWithMe && (
+  <div className="mt-2 mb-3">
+    <div className="d-inline-block">
+      <button
+        type="button"
+        className="badge rounded-pill text-bg-info border-0"
+        style={{ cursor: "pointer" }}
+        title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
+        onClick={(event) => {
+          const details = event.currentTarget.nextElementSibling;
+          details.classList.toggle("d-none");
+        }}
+        onMouseEnter={(event) => {
+          const details = event.currentTarget.nextElementSibling;
+          details.classList.remove("d-none");
+        }}
+        onMouseLeave={(event) => {
+          const details = event.currentTarget.nextElementSibling;
+          details.classList.add("d-none");
+        }}
+      >
+        <i className="bi bi-people-fill me-1"></i>
+        Shared with you
+      </button>
+
+      <div className="small text-muted mt-2 d-none text-break">
+        <i className="bi bi-person-check me-1"></i>
+        Shared by: {album.ownerEmail || "Unknown owner"}
+      </div>
+    </div>
+  </div>
+)} */}
+
+{album.isSharedWithMe && (
+  <div className="mt-2 mb-3">
+    <span
+      className="badge rounded-pill text-bg-info"
+      style={{ cursor: "default" }}
+      title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
+    >
+      <i className="bi bi-people-fill me-1"></i>
+      Shared with you
+    </span>
+  </div>
+)}
+
                     </div>
 
                     {/* ALBUM METADATA */}

@@ -123,6 +123,7 @@ function AlbumUploadForm({
   onTagsChange,
   onSubmit,
   onCancel,
+    fileInputRef,
 }) {
   return (
     <div className="card border-0 shadow-sm mb-4">
@@ -155,6 +156,7 @@ function AlbumUploadForm({
             </label>
 
             <input
+              ref={fileInputRef}
               id="imageFile"
               type="file"
               className="form-control"

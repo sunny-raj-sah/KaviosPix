@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect,  useRef ,useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -27,6 +27,9 @@ import AlbumShareForm from "../components/albums/AlbumShareForm";
 function AlbumDetails() {
   const { user } = useAuth();
   const { albumId } = useParams();
+
+  const uploadFormRef = useRef(null);
+const fileInputRef = useRef(null);
 
   const [album, setAlbum] = useState(null);
   const [images, setImages] = useState([]);
@@ -73,6 +76,33 @@ const [deletingComment, setDeletingComment] =
   // to revok the share  album to the mail id
   const [revokingUser, setRevokingUser] =
   useState(null);
+
+
+  //for fucusing on the image form
+  useEffect(() => {
+  if (!showUploadForm) return;
+
+  const timer = setTimeout(() => {
+    const form = uploadFormRef.current;
+    const fileInput = fileInputRef.current;
+
+    if (form) {
+      const top =
+        form.getBoundingClientRect().top +
+        window.scrollY -
+        100;
+
+      window.scrollTo({
+        top: Math.max(0, top),
+        behavior: "smooth",
+      });
+    }
+
+    fileInput?.focus({ preventScroll: true });
+  }, 300);
+
+  return () => clearTimeout(timer);
+}, [showUploadForm]);
   // handler to revok the share  album to the mail id
   const handleRevokeAccess = async (email) => {
   const confirmed = window.confirm(
@@ -417,82 +447,82 @@ const handleDeleteImage = async (imageId) => {
   // LOAD IMAGES
   // --------------------------------------------------
 
-  //   const loadImages = async (tags = activeTags) => {
-  //     try {
-  //       setLoadingImages(true);
+    const loadImages = async (tags = activeTags) => {
+      try {
+        setLoadingImages(true);
 
-  //       const response =
-  //         await getAlbumImages( albumId,
-  //     tags.join(","));
+        const response =
+          await getAlbumImages( albumId,
+      tags.join(","));
 
-  //       console.log(
-  //         "GET /albums/:albumId/images response:",
-  //         response
-  //       );
+        console.log(
+          "GET /albums/:albumId/images response:",
+          response
+        );
 
-  //       let imageList = [];
+        let imageList = [];
 
-  //       if (Array.isArray(response)) {
-  //         imageList = response;
-  //       } else if (
-  //         Array.isArray(response?.images)
-  //       ) {
-  //         imageList = response.images;
-  //       } else if (
-  //         Array.isArray(response?.data)
-  //       ) {
-  //         imageList = response.data;
-  //       }
+        if (Array.isArray(response)) {
+          imageList = response;
+        } else if (
+          Array.isArray(response?.images)
+        ) {
+          imageList = response.images;
+        } else if (
+          Array.isArray(response?.data)
+        ) {
+          imageList = response.data;
+        }
 
-  //       setImages(imageList);
+        setImages(imageList);
 
-  //       if (imageList.length > 0) {
-  //         await loadImageFiles(imageList);
-  //       } else {
-  //         setImageUrls({});
-  //       }
-  //     } catch (err) {
-  //       console.error(
-  //         "Failed to load album images:",
-  //         err
-  //       );
-  //     } finally {
-  //       setLoadingImages(false);
+        if (imageList.length > 0) {
+          await loadImageFiles(imageList);
+        } else {
+          setImageUrls({});
+        }
+      } catch (err) {
+        console.error(
+          "Failed to load album images:",
+          err
+        );
+      } finally {
+        setLoadingImages(false);
+      }
+    };
+  // const loadImages = async (tags = activeTags) => {
+  //   try {
+  //     setLoadingImages(true);
+
+  //     const response = await getAlbumImages(albumId, tags.join(","));
+
+  //     console.log("GET /albums/:albumId/images response:", response);
+
+  //     let imageList = [];
+
+  //     if (Array.isArray(response)) {
+  //       imageList = response;
+  //     } else if (Array.isArray(response?.images)) {
+  //       imageList = response.images;
+  //     } else if (Array.isArray(response?.data)) {
+  //       imageList = response.data;
   //     }
-  //   };
-  const loadImages = async (tags = activeTags) => {
-    try {
-      setLoadingImages(true);
 
-      const response = await getAlbumImages(albumId, tags.join(","));
+  //     setImages(imageList);
 
-      console.log("GET /albums/:albumId/images response:", response);
+  //     if (imageList.length > 0) {
+  //       await loadImageFiles(imageList);
+  //     } else {
+  //       setImageUrls({});
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to load album images:", err);
 
-      let imageList = [];
-
-      if (Array.isArray(response)) {
-        imageList = response;
-      } else if (Array.isArray(response?.images)) {
-        imageList = response.images;
-      } else if (Array.isArray(response?.data)) {
-        imageList = response.data;
-      }
-
-      setImages(imageList);
-
-      if (imageList.length > 0) {
-        await loadImageFiles(imageList);
-      } else {
-        setImageUrls({});
-      }
-    } catch (err) {
-      console.error("Failed to load album images:", err);
-
-      setError(err.response?.data?.message || "Failed to load album images.");
-    } finally {
-      setLoadingImages(false);
-    }
-  };
+  //     setError(err.response?.data?.message || "Failed to load album images.");
+  //   } finally {
+  //     setLoadingImages(false);
+  //   }
+  // };
 
   // --------------------------------------------------
   // FILE VALIDATION
@@ -733,6 +763,8 @@ const handleUploadImage = async (event) => {
   revokingUser={revokingUser}
       />)}
       {showUploadForm && (
+        
+
         // <AlbumUploadForm
         //   selectedFile={selectedFile}
         //   uploading={uploading}
@@ -741,6 +773,7 @@ const handleUploadImage = async (event) => {
         //   onSubmit={handleUploadImage}
         //   onCancel={handleCancelUpload}
         // />
+        <div ref={uploadFormRef}>
   <AlbumUploadForm
   selectedFile={selectedFile}
   person={person}
@@ -752,7 +785,9 @@ const handleUploadImage = async (event) => {
   onTagsChange={(event) => setTags(event.target.value)}
   onSubmit={handleUploadImage}
   onCancel={handleCancelUpload}
+    fileInputRef={fileInputRef}
 />
+ </div>
       )}
       <ImageFilter
         activeTags={activeTags}
