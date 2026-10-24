@@ -604,6 +604,7 @@ import ImageComments from "./ImageComments";
 function ImageCard({
   image,
   imageUrl,
+   onImageClick,
   onToggleFavorite,
   updatingFavorite,
   onAddComment,
@@ -675,12 +676,23 @@ function ImageCard({
               src={imageUrl}
               alt={image.name || "Album image"}
               loading="lazy"
+               onClick={() => onImageClick?.(image)}
+               onKeyDown={(event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onImageClick?.(image);
+    }
+  }}
+  role="button"
+  tabIndex={0}
+  title="Click to view full-resolution image"
               style={{
                 display: "block",
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
                 objectPosition: "center",
+                    cursor: "pointer",
               }}
               onError={() => {
                 console.error(

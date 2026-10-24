@@ -119,7 +119,8 @@ function ImageGallery({
   images,
   imageUrls,
   loading,
-  onUpload,
+  // onUpload,
+    onImageClick,
   onToggleFavorite,
   updatingFavorite,
   onAddComment,
@@ -130,6 +131,8 @@ function ImageGallery({
     onDeleteComment,
   deletingComment,
    uploadButtonRef,
+   showUploadForm,
+  onToggleUpload,
 }) {
   return (
     <>
@@ -174,14 +177,29 @@ function ImageGallery({
               Upload your first photo to this album.
             </p>
 
-            <button
+            {/* <button
              ref={uploadButtonRef}
               type="button"
               className="btn btn-primary"
               onClick={onUpload}
             >
               + Upload Image
-            </button>
+            </button> */}
+             <div>
+                {isAlbumOwner && (
+              <button
+              ref={uploadButtonRef}
+
+                type="button"
+                className="btn btn-primary"
+                onClick={onToggleUpload}
+              >
+                {showUploadForm
+                  ? "Close Upload"
+                  : "+ Upload Image"}
+              </button>
+                )}
+            </div>
           </div>
         </div>
       )}
@@ -197,6 +215,7 @@ function ImageGallery({
                 key={imageId}
                 image={image}
                 imageUrl={imageUrls[imageId]}
+                  onImageClick={onImageClick}
                 onToggleFavorite={onToggleFavorite}
                 updatingFavorite={updatingFavorite}
                 onAddComment={onAddComment}

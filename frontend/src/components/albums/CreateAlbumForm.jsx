@@ -99,9 +99,10 @@ function CreateAlbumForm({
               className="form-label fw-semibold"
             >
               Album Name
-              <span className="text-danger ms-1">
+              <span className="text-danger ms-1" aria-hidden="true">
                 *
               </span>
+                <span className="visually-hidden"> (required)</span>
             </label>
 
             <input
@@ -124,6 +125,7 @@ function CreateAlbumForm({
               disabled={creating}
               autoComplete="off"
               maxLength={100}
+               required
             />
 
             <div className="form-text">

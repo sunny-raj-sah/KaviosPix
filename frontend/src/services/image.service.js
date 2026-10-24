@@ -1,5 +1,6 @@
  import api from "./api";
 
+ 
 export const getAlbumImages = async (
   albumId,
   tags
@@ -106,6 +107,18 @@ export const getImageFile = async (
     {
       responseType: "blob",
     }
+  );
+
+  return response.data;
+};
+
+
+export const getImageThumbnail = async (albumId, imageId) => {
+  const response = await api.get(
+    `/albums/${albumId}/images/${imageId}/thumbnail`,
+    {
+      responseType: "blob",
+    },
   );
 
   return response.data;

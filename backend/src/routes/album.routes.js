@@ -38,6 +38,7 @@ const {
        deleteComment,
        deleteImage,
          serveImage,
+           serveImageThumbnail,
 } = require("../controllers/image.controller");
 
  
@@ -140,4 +141,11 @@ router.get(
   serveImage,
 );
 
+router.get(
+  "/:albumId/images/:imageId/thumbnail",
+  authenticate,
+  requireAlbumAccess,
+  requireImageInAlbum,
+  serveImageThumbnail,
+);
 module.exports = router;

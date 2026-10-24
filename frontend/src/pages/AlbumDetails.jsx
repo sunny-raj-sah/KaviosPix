@@ -12,6 +12,7 @@ import {
   addComment,
    deleteComment,
     deleteImage,
+      getImageThumbnail,
 } from "../services/image.service";
 
 import {
@@ -77,8 +78,12 @@ const [deletingComment, setDeletingComment] =
   const [revokingUser, setRevokingUser] =
   useState(null);
 
+// for the selected image from the thumbnail
+const [selectedOriginalUrl, setSelectedOriginalUrl] = useState(null);
+const [loadingOriginal, setLoadingOriginal] = useState(false);
+const [originalImageError, setOriginalImageError] = useState("");
 
-  //for fucusing on the image form
+  //for fucusing on the image upload form
   useEffect(() => {
   if (!showUploadForm) return;
 
@@ -406,42 +411,111 @@ const handleDeleteImage = async (imageId) => {
   // LOAD PROTECTED IMAGE FILES
   // --------------------------------------------------
 
-  const loadImageFiles = async (imageList) => {
-    try {
-      const results = await Promise.all(
-        imageList.map(async (image) => {
-          const imageId = image.imageId || image._id;
+  // const loadImageFiles = async (imageList) => {
+  //   try {
+  //     const results = await Promise.all(
+  //       imageList.map(async (image) => {
+  //         const imageId = image.imageId || image._id;
 
-          if (!imageId) {
-            return null;
-          }
+  //         if (!imageId) {
+  //           return null;
+  //         }
 
-          const blob = await getImageFile(albumId, imageId);
+  //         const blob = await getImageFile(albumId, imageId);
 
-          const objectUrl = URL.createObjectURL(blob);
+  //         const objectUrl = URL.createObjectURL(blob);
 
-          return {
-            imageId,
-            objectUrl,
-          };
-        }),
-      );
+  //         return {
+  //           imageId,
+  //           objectUrl,
+  //         };
+  //       }),
+  //     );
 
-      const urlMap = {};
+  //     const urlMap = {};
 
-      results.forEach((result) => {
-        if (!result) {
-          return;
-        }
+  //     results.forEach((result) => {
+  //       if (!result) {
+  //         return;
+  //       }
 
+  //       urlMap[result.imageId] = result.objectUrl;
+  //     });
+
+  //     setImageUrls(urlMap);
+  //   } catch (err) {
+  //     console.error("Failed to load image files:", err);
+  //   }
+  // };
+  const loadThumbnailFiles = async (imageList) => {
+  const results = await Promise.all(
+    imageList.map(async (image) => {
+      const imageId = image.imageId || image._id;
+
+      if (!imageId) return null;
+
+      try {
+        const blob = await getImageThumbnail(albumId, imageId);
+        const objectUrl = URL.createObjectURL(blob);
+
+        return { imageId, objectUrl };
+      } catch (error) {
+        console.error(
+          `Failed to load thumbnail for image ${imageId}:`,
+          error,
+        );
+        return null;
+      }
+    }),
+  );
+
+  setImageUrls((previousUrls) => {
+    // Revoke URLs that are being replaced to avoid memory leaks.
+    results.forEach((result) => {
+      if (result && previousUrls[result.imageId]) {
+        URL.revokeObjectURL(previousUrls[result.imageId]);
+      }
+    });
+
+    const urlMap = {};
+    results.forEach((result) => {
+      if (result) {
         urlMap[result.imageId] = result.objectUrl;
-      });
+      }
+    });
 
-      setImageUrls(urlMap);
-    } catch (err) {
-      console.error("Failed to load image files:", err);
-    }
-  };
+    return urlMap;
+  });
+};
+
+// for the image download for the thumbnail click
+
+const handleImageClick = async (image) => {
+  const imageId = image.imageId || image._id;
+
+  if (!imageId || loadingOriginal) return;
+
+  setLoadingOriginal(true);
+  setOriginalImageError("");
+
+  try {
+    const blob = await getImageFile(albumId, imageId);
+    const originalUrl = URL.createObjectURL(blob);
+
+    setSelectedOriginalUrl((previousUrl) => {
+      if (previousUrl) {
+        URL.revokeObjectURL(previousUrl);
+      }
+
+      return originalUrl;
+    });
+  } catch (error) {
+    console.error("Failed to load original image:", error);
+    setOriginalImageError("Unable to load the original image. Please try again.");
+  } finally {
+    setLoadingOriginal(false);
+  }
+};
 
   // --------------------------------------------------
   // LOAD IMAGES
@@ -477,7 +551,8 @@ const handleDeleteImage = async (imageId) => {
         setImages(imageList);
 
         if (imageList.length > 0) {
-          await loadImageFiles(imageList);
+          // await loadImageFiles(imageList);
+          await loadThumbnailFiles(imageList);
         } else {
           setImageUrls({});
         }
@@ -799,6 +874,7 @@ const handleUploadImage = async (event) => {
         images={images}
         imageUrls={imageUrls}
         loading={loadingImages}
+         onImageClick={handleImageClick}
         onUpload={() => {
           setShowUploadForm(true);
           setUploadError("");
@@ -812,7 +888,78 @@ const handleUploadImage = async (event) => {
   deletingImage={deletingImage}
    onDeleteComment={handleDeleteComment}
   deletingComment={deletingComment}
+
+  showUploadForm={showUploadForm}
+  onToggleUpload={() => {
+    setShowUploadForm(
+      (current) => !current
+    );
+
+    setUploadError("");
+  }}
       />
+
+      
+
+{loadingOriginal && (
+  <div className="text-center my-3" role="status">
+    
+    <strong>Loading original image...</strong>
+
+    <p className="small mb-0 mt-2">
+      This may take a little longer if the server is waking up
+      after a period of inactivity on the free hosting tier.
+      Please wait while we fetch the full-resolution image.
+    </p>
+  </div>
+)}
+
+{originalImageError && (
+  <div className="alert alert-danger" role="alert">
+    {originalImageError}
+  </div>
+)}
+
+{selectedOriginalUrl && (
+  <div
+    className="position-fixed top-0 start-0 w-100 h-100 d-flex flex-column align-items-center justify-content-center"
+    style={{
+      backgroundColor: "rgba(0, 0, 0, 0.9)",
+      zIndex: 2000,
+      padding: "20px",
+    }}
+  >
+    <button
+      type="button"
+      className="btn btn-light align-self-end mb-3"
+      onClick={() => {
+        URL.revokeObjectURL(selectedOriginalUrl);
+        setSelectedOriginalUrl(null);
+      }}
+    >
+      Close
+    </button>
+
+    <img
+      src={selectedOriginalUrl}
+      alt="Full-resolution original"
+      style={{
+        maxWidth: "100%",
+        maxHeight: "80vh",
+        objectFit: "contain",
+      }}
+    />
+
+    <a
+      className="btn btn-primary mt-3"
+      href={selectedOriginalUrl}
+      download="kaviospix-original"
+    >
+      Download original
+    </a>
+  </div>
+)}
+
     </div>
   );
 }

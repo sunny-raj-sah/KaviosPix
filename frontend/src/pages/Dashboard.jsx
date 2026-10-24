@@ -1,6 +1,6 @@
- 
+ import "./Dashboard.css";
  import { useEffect,useRef,useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate  } from "react-router-dom";
 
 import {
   createAlbum,
@@ -10,6 +10,7 @@ import {
 } from "../services/album.service";
 
 function Dashboard() {
+  const navigate = useNavigate();
   const [albums, setAlbums] = useState([]);
 const createAlbumFormRef = useRef(null);
 const albumNameInputRef = useRef(null);
@@ -365,7 +366,8 @@ useEffect(() => {
  
  
   return (
-    <div className="container py-4 py-md-5">
+    // <div className="container py-4 py-md-5">
+    <div className="container-fluid dashboard-page px-3 px-md-4 px-lg-5 py-4 py-md-5">
       {/* PAGE HEADER */}
 
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -381,7 +383,8 @@ useEffect(() => {
 
         <button
           type="button"
-          className="btn btn-primary"
+          // className="btn btn-primary"
+            className="btn btn-primary w-100 w-md-auto"
           onClick={() => {
             setShowCreateForm(
               (current) => !current
@@ -552,152 +555,262 @@ useEffect(() => {
           </div>
         </div>
       ) : (
-        <div className="row g-4">
-          {albums.map((album) => {
-            const albumId =
-              album.albumId || album._id;
+//         <div className="row g-4">
+//           {albums.map((album) => {
+//             const albumId =
+//               album.albumId || album._id;
 
-            const sharedUsers =
-              Array.isArray(album.sharedUsers)
-                ? album.sharedUsers
-                : [];
+//             const sharedUsers =
+//               Array.isArray(album.sharedUsers)
+//                 ? album.sharedUsers
+//                 : [];
 
-            return (
-              <div
-                className="col-12 col-md-6 col-lg-4"
-                key={albumId}
-              >
-                <div className="card h-100 border-0 shadow-sm">
-                  <div className="card-body d-flex flex-column">
-                    <div className="mb-3">
-                      <h2 className="h5 fw-bold mb-2">
-                        {album.name}
-                      </h2>
+//             return (
+//               <div
+//                 className="col-12 col-md-6 col-lg-4"
+//                 key={albumId}
+//               >
+//                 <div className="card h-100 border-0 shadow-sm">
+//                   <div className="card-body d-flex flex-column">
+//                     <div className="mb-3">
+//                       <h2 className="h5 fw-bold mb-2">
+//                         {album.name}
+//                       </h2>
 
-                      <p className="text-secondary mb-0">
-                        {album.description ||
-                          "No description added."}
-                      </p>
+//                       <p className="text-secondary mb-0">
+//                         {album.description ||
+//                           "No description added."}
+//                       </p>
                       
-{/* {album.isSharedWithMe && (
-  <div className="mt-2 mb-3">
-    <div className="d-inline-block">
-      <button
-        type="button"
-        className="badge rounded-pill text-bg-info border-0"
-        style={{ cursor: "pointer" }}
-        title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
-        onClick={(event) => {
-          const details = event.currentTarget.nextElementSibling;
-          details.classList.toggle("d-none");
-        }}
-        onMouseEnter={(event) => {
-          const details = event.currentTarget.nextElementSibling;
-          details.classList.remove("d-none");
-        }}
-        onMouseLeave={(event) => {
-          const details = event.currentTarget.nextElementSibling;
-          details.classList.add("d-none");
-        }}
-      >
-        <i className="bi bi-people-fill me-1"></i>
-        Shared with you
-      </button>
+// {/* {album.isSharedWithMe && (
+//   <div className="mt-2 mb-3">
+//     <div className="d-inline-block">
+//       <button
+//         type="button"
+//         className="badge rounded-pill text-bg-info border-0"
+//         style={{ cursor: "pointer" }}
+//         title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
+//         onClick={(event) => {
+//           const details = event.currentTarget.nextElementSibling;
+//           details.classList.toggle("d-none");
+//         }}
+//         onMouseEnter={(event) => {
+//           const details = event.currentTarget.nextElementSibling;
+//           details.classList.remove("d-none");
+//         }}
+//         onMouseLeave={(event) => {
+//           const details = event.currentTarget.nextElementSibling;
+//           details.classList.add("d-none");
+//         }}
+//       >
+//         <i className="bi bi-people-fill me-1"></i>
+//         Shared with you
+//       </button>
 
-      <div className="small text-muted mt-2 d-none text-break">
-        <i className="bi bi-person-check me-1"></i>
-        Shared by: {album.ownerEmail || "Unknown owner"}
-      </div>
-    </div>
-  </div>
-)} */}
+//       <div className="small text-muted mt-2 d-none text-break">
+//         <i className="bi bi-person-check me-1"></i>
+//         Shared by: {album.ownerEmail || "Unknown owner"}
+//       </div>
+//     </div>
+//   </div>
+// )} */}
 
-{album.isSharedWithMe && (
-  <div className="mt-2 mb-3">
-    <span
-      className="badge rounded-pill text-bg-info"
-      style={{ cursor: "default" }}
-      title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
-    >
-      <i className="bi bi-people-fill me-1"></i>
-      Shared with you
-    </span>
-  </div>
-)}
+// {album.isSharedWithMe && (
+//   <div className="mt-2 mb-3">
+//     <span
+//       className="badge rounded-pill text-bg-info"
+//       style={{ cursor: "default" }}
+//       title={`Shared by: ${album.ownerEmail || "Unknown owner"}`}
+//     >
+//       <i className="bi bi-people-fill me-1"></i>
+//       Shared with you
+//     </span>
+//   </div>
+// )}
 
-                    </div>
+//                     </div>
 
-                    {/* ALBUM METADATA */}
+//                     {/* ALBUM METADATA */}
 
-                    <div className="small text-secondary mb-3">
-                      <div>
-                        <strong>Album ID:</strong>{" "}
-                        <span className="text-break">
-                          {album.albumId}
-                        </span>
-                      </div>
+//                     <div className="small text-secondary mb-3">
+//                       <div>
+//                         <strong>Album ID:</strong>{" "}
+//                         <span className="text-break">
+//                           {album.albumId}
+//                         </span>
+//                       </div>
 
-                      <div>
-                        <strong>Shared:</strong>{" "}
-                        {sharedUsers.length} user
-                        {sharedUsers.length !== 1
-                          ? "s"
-                          : ""}
-                      </div>
+//                       <div>
+//                         <strong>Shared:</strong>{" "}
+//                         {sharedUsers.length} user
+//                         {sharedUsers.length !== 1
+//                           ? "s"
+//                           : ""}
+//                       </div>
 
-                      {album.createdAt && (
-                        <div>
-                          <strong>Created:</strong>{" "}
-                          {new Date(
-                            album.createdAt
-                          ).toLocaleDateString()}
-                        </div>
-                      )}
-                    </div>
+//                       {album.createdAt && (
+//                         <div>
+//                           <strong>Created:</strong>{" "}
+//                           {new Date(
+//                             album.createdAt
+//                           ).toLocaleDateString()}
+//                         </div>
+//                       )}
+//                     </div>
 
-                    {/* ACTIONS */}
+//                     {/* ACTIONS */}
 
-                    <div className="mt-auto d-flex flex-wrap gap-2">
-                      <Link
-                        to={`/albums/${albumId}`}
-                        className="btn btn-outline-primary btn-sm"
-                      >
-                        Open Album
-                      </Link>
+//                     <div className="mt-auto d-flex flex-wrap gap-2">
+//                       <Link
+//                         to={`/albums/${albumId}`}
+//                         className="btn btn-outline-primary btn-sm"
+//                       >
+//                         Open Album
+//                       </Link>
 
-                      <button
-                        type="button"
-                        className="btn btn-outline-secondary btn-sm"
-                        onClick={() =>
-                          handleOpenEdit(album)
-                        }
-                      >
-                        Edit
-                      </button>
+//                       <button
+//                         type="button"
+//                         className="btn btn-outline-secondary btn-sm"
+//                         onClick={() =>
+//                           handleOpenEdit(album)
+//                         }
+//                       >
+//                         Edit
+//                       </button>
 
-                      <button
-                        type="button"
-                        className="btn btn-outline-danger btn-sm"
-                        onClick={() =>
-                          handleDeleteAlbum(album)
-                        }
-                        disabled={
-                          deletingAlbumId ===
-                          albumId
-                        }
-                      >
-                        {deletingAlbumId ===
-                        albumId
-                          ? "Deleting..."
-                          : "Delete"}
-                      </button>
-                    </div>
-                  </div>
+//                       <button
+//                         type="button"
+//                         className="btn btn-outline-danger btn-sm"
+//                         onClick={() =>
+//                           handleDeleteAlbum(album)
+//                         }
+//                         disabled={
+//                           deletingAlbumId ===
+//                           albumId
+//                         }
+//                       >
+//                         {deletingAlbumId ===
+//                         albumId
+//                           ? "Deleting..."
+//                           : "Delete"}
+//                       </button>
+//                     </div>
+//                   </div>
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+
+
+<div className="row g-3 g-md-4">
+  {albums.map((album) => {
+    const albumId = album.albumId || album._id;
+
+    const sharedUsers = Array.isArray(album.sharedUsers)
+      ? album.sharedUsers
+      : [];
+
+    return (
+      <div className="col-12 col-sm-6 col-xl-4" key={albumId}>
+        <div
+          className="card album-card h-100"
+          role="link"
+          tabIndex={0}
+          aria-label={`Open album ${album.name}`}
+          onClick={() => navigate(`/albums/${albumId}`)}
+          onKeyDown={(event) => {
+            if (
+              event.target === event.currentTarget &&
+              (event.key === "Enter" || event.key === " ")
+            ) {
+              event.preventDefault();
+              navigate(`/albums/${albumId}`);
+            }
+          }}
+        >
+          <div className="card-body d-flex flex-column p-3 p-md-4">
+            <div className="mb-3">
+              <h2 className="h5 fw-bold mb-2 text-break">
+                {album.name}
+              </h2>
+
+              <p className="text-secondary mb-0 album-description">
+                {album.description || "No description added."}
+              </p>
+
+              {album.isSharedWithMe && (
+                <div className="mt-3">
+                  <span className="badge rounded-pill text-bg-info">
+                    <i className="bi bi-people-fill me-1" />
+                    Shared with you
+                  </span>
                 </div>
+              )}
+            </div>
+
+            <div className="album-metadata small mb-3">
+              <div className="mb-2">
+                <strong>Album ID:</strong>{" "}
+                <span className="text-break">
+                  {album.albumId || album._id}
+                </span>
               </div>
-            );
-          })}
+
+              <div className="mb-2">
+                <strong>Shared:</strong> {sharedUsers.length} user
+                {sharedUsers.length !== 1 ? "s" : ""}
+              </div>
+
+              {album.createdAt && (
+                <div>
+                  <strong>Created:</strong>{" "}
+                  {new Date(album.createdAt).toLocaleDateString()}
+                </div>
+              )}
+            </div>
+
+            <div className="mt-auto d-flex flex-wrap gap-2 album-actions">
+              <Link
+                to={`/albums/${albumId}`}
+                className="btn btn-outline-primary btn-sm"
+                onClick={(event) => event.stopPropagation()}
+              >
+                Open Album
+              </Link>
+
+              <button
+                type="button"
+                className="btn btn-outline-secondary btn-sm"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleOpenEdit(album);
+                }}
+              >
+                Edit
+              </button>
+
+              <button
+                type="button"
+                className="btn btn-outline-danger btn-sm"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDeleteAlbum(album);
+                }}
+                disabled={deletingAlbumId === albumId}
+              >
+                {deletingAlbumId === albumId
+                  ? "Deleting..."
+                  : "Delete"}
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
+    );
+  })}
+</div>
+
       )}
 
       {/* EDIT ALBUM MODAL */}
