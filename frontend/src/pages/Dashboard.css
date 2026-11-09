@@ -1,14 +1,15 @@
+ 
 
 .dashboard-page {
   min-height: 100vh;
-  background-color: #f3f5f9;
+  background-color: #e9edf5;
 }
 
 .album-card {
   background-color: #ffffff;
-  border: 1px solid #e0e5ed;
+  border: 1px solid #d5dce8;
   border-radius: 14px;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
   transition:
     box-shadow 0.2s ease,
     transform 0.2s ease,
@@ -18,8 +19,8 @@
 }
 
 .album-card:hover {
-  border-color: #b7ccff;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  border-color: #9bb8f5;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.13);
   transform: translateY(-2px);
 }
 
@@ -34,7 +35,7 @@
 }
 
 .album-metadata {
-  color: #5f6b7a;
+  color: #526075;
   overflow-wrap: anywhere;
   line-height: 1.6;
 }

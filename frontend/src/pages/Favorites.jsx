@@ -178,7 +178,12 @@ function Favorites() {
 
   if (loading) {
     return (
-      <div className="container py-5">
+   
+      <div
+  className="container-fluid min-vh-100 py-5"
+  style={{ backgroundColor: "#e9edf5" }}
+>
+  <div className="container"></div>
         <div className="text-center py-5">
           <div
             className="spinner-border"
@@ -219,7 +224,13 @@ function Favorites() {
   }
 
   return (
-    <div className="container py-4 py-md-5">
+   
+    // <div className="container-fluid bg-light min-vh-100 py-4 py-md-5">
+    <div
+  className="container-fluid min-vh-100 py-4 py-md-5"
+  style={{ backgroundColor: "#e9edf5" }}
+>
+  <div className="container">
       <div className="mb-4">
         <Link
           to="/dashboard"
@@ -241,7 +252,17 @@ function Favorites() {
       </div>
 
       {favorites.length === 0 ? (
-        <div className="card border-0 shadow-sm">
+        
+       
+        <div
+  className="card"
+  style={{
+    backgroundColor: "#ffffff",
+    border: "1px solid #d5dce8",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(15, 23, 42, 0.08)",
+  }}
+>
           <div className="card-body text-center py-5">
             <div className="display-4 mb-3">
               ☆
@@ -285,7 +306,16 @@ function Favorites() {
                   className="col-6 col-md-4 col-lg-3"
                   key={`${image.albumId}-${imageId}`}
                 >
-                  <div className="card border-0 shadow-sm h-100 overflow-hidden">
+                  
+                  <div
+  className="card h-100 overflow-hidden"
+  style={{
+    backgroundColor: "#ffffff",
+    border: "1px solid #d5dce8",
+    borderRadius: "14px",
+    boxShadow: "0 4px 16px rgba(15, 23, 42, 0.08)",
+  }}
+>
                     {imageUrls[imageId] ? (
                       <img
                         src={imageUrls[imageId]}
@@ -367,6 +397,7 @@ function Favorites() {
           </div>
         </>
       )}
+    </div>
     </div>
   );
 }

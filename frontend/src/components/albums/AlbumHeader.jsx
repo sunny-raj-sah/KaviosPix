@@ -22,7 +22,8 @@ function AlbumHeader({
       </div>
 
       {/* Album Header */}
-      <div className="card border-0 shadow-sm mb-4">
+      {/* <div className="card border-0 shadow-sm mb-4"> */}
+      <div className="card border shadow-sm mb-4">
         <div className="card-body p-4">
           <div className="d-flex flex-column flex-md-row justify-content-between gap-3">
             <div>

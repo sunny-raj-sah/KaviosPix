@@ -411,42 +411,7 @@ const handleDeleteImage = async (imageId) => {
   // LOAD PROTECTED IMAGE FILES
   // --------------------------------------------------
 
-  // const loadImageFiles = async (imageList) => {
-  //   try {
-  //     const results = await Promise.all(
-  //       imageList.map(async (image) => {
-  //         const imageId = image.imageId || image._id;
-
-  //         if (!imageId) {
-  //           return null;
-  //         }
-
-  //         const blob = await getImageFile(albumId, imageId);
-
-  //         const objectUrl = URL.createObjectURL(blob);
-
-  //         return {
-  //           imageId,
-  //           objectUrl,
-  //         };
-  //       }),
-  //     );
-
-  //     const urlMap = {};
-
-  //     results.forEach((result) => {
-  //       if (!result) {
-  //         return;
-  //       }
-
-  //       urlMap[result.imageId] = result.objectUrl;
-  //     });
-
-  //     setImageUrls(urlMap);
-  //   } catch (err) {
-  //     console.error("Failed to load image files:", err);
-  //   }
-  // };
+  
   const loadThumbnailFiles = async (imageList) => {
   const results = await Promise.all(
     imageList.map(async (image) => {
@@ -565,40 +530,7 @@ const handleImageClick = async (image) => {
         setLoadingImages(false);
       }
     };
-  // const loadImages = async (tags = activeTags) => {
-  //   try {
-  //     setLoadingImages(true);
-
-  //     const response = await getAlbumImages(albumId, tags.join(","));
-
-  //     console.log("GET /albums/:albumId/images response:", response);
-
-  //     let imageList = [];
-
-  //     if (Array.isArray(response)) {
-  //       imageList = response;
-  //     } else if (Array.isArray(response?.images)) {
-  //       imageList = response.images;
-  //     } else if (Array.isArray(response?.data)) {
-  //       imageList = response.data;
-  //     }
-
-  //     setImages(imageList);
-
-  //     if (imageList.length > 0) {
-  //       await loadImageFiles(imageList);
-  //     } else {
-  //       setImageUrls({});
-  //     }
-  //   } catch (err) {
-  //     console.error("Failed to load album images:", err);
-
-  //     setError(err.response?.data?.message || "Failed to load album images.");
-  //   } finally {
-  //     setLoadingImages(false);
-  //   }
-  // };
-
+  
   // --------------------------------------------------
   // FILE VALIDATION
   // --------------------------------------------------
@@ -642,42 +574,7 @@ const handleImageClick = async (image) => {
   // --------------------------------------------------
   // UPLOAD IMAGE
   // --------------------------------------------------
-
-  // const handleUploadImage = async (event) => {
-  //   event.preventDefault();
-
-  //   if (!selectedFile) {
-  //     setUploadError("Please select an image.");
-
-  //     return;
-  //   }
-
-  //   try {
-  //     setUploading(true);
-  //     setUploadError("");
-
-  //     const formData = new FormData();
-
-  //     formData.append("image", selectedFile);
-
-  //     const response = await uploadImage(albumId, formData);
-
-  //     console.log("POST /albums/:albumId/images response:", response);
-
-  //     setSelectedFile(null);
-  //     setShowUploadForm(false);
-
-  //     await loadImages();
-  //   } catch (err) {
-  //     console.error("Failed to upload image:", err);
-
-  //     setUploadError(
-  //       err.response?.data?.message || err.message || "Failed to upload image.",
-  //     );
-  //   } finally {
-  //     setUploading(false);
-  //   }
-  // };
+ 
 const handleUploadImage = async (event) => {
   event.preventDefault();
 
@@ -781,7 +678,15 @@ const handleUploadImage = async (event) => {
 
   if (loadingAlbum) {
     return (
-      <div className="container py-5">
+      
+      <div
+  className="container-fluid py-5"
+  style={{
+    backgroundColor: "#e9edf5",
+    minHeight: "100vh",
+  }}
+>
+  <div className="container"></div>
         <div className="d-flex justify-content-center">
           <div className="spinner-border" role="status">
             <span className="visually-hidden">Loading...</span>
@@ -797,7 +702,15 @@ const handleUploadImage = async (event) => {
 
   if (error || !album) {
     return (
-      <div className="container py-5">
+      
+      <div
+  className="container-fluid py-5"
+  style={{
+    backgroundColor: "#e9edf5",
+    minHeight: "100vh",
+  }}
+>
+  <div className="container"></div>
         <div className="alert alert-danger" role="alert">
           {error || "Album not found."}
         </div>
@@ -816,7 +729,15 @@ const handleUploadImage = async (event) => {
   // --------------------------------------------------
 
   return (
-    <div className="container py-4 py-md-5">
+    // <div className="container py-4 py-md-5">
+    <div
+  className="container-fluid py-4 py-md-5"
+  style={{
+    backgroundColor: "#e9edf5",
+    minHeight: "100vh",
+  }}
+>
+  <div className="container">
        <AlbumHeader
   album={album}
   sharedUsersCount={sharedUsers.length}
@@ -840,14 +761,7 @@ const handleUploadImage = async (event) => {
       {showUploadForm && (
         
 
-        // <AlbumUploadForm
-        //   selectedFile={selectedFile}
-        //   uploading={uploading}
-        //   uploadError={uploadError}
-        //   onFileChange={handleFileChange}
-        //   onSubmit={handleUploadImage}
-        //   onCancel={handleCancelUpload}
-        // />
+     
         <div ref={uploadFormRef}>
   <AlbumUploadForm
   selectedFile={selectedFile}
@@ -960,6 +874,7 @@ const handleUploadImage = async (event) => {
   </div>
 )}
 
+    </div>
     </div>
   );
 }
